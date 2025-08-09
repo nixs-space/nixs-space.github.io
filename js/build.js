@@ -97,11 +97,18 @@ async function minifyJS() {
     await ensureDirectoryExists(BUILD_DIR);
 
     // Get lib files to copy
-    const libFiles = await glob(`${SOURCE_DIR}/libs/**/*.js`);
-    
+    // const libFiles = await glob(`${SOURCE_DIR}/libs/**/*.js`);
+    const libFiles = await glob(path.join(SOURCE_DIR, "libs/**/*.js"), {
+      windowsPathsNoEscape: true, // 确保 Windows 路径解析正确
+    });
+
     // Get JS files to minify (excluding libs and other ignored patterns)
-    const files = await glob(`${SOURCE_DIR}/**/*.js`, {
+    // const files = await glob(`${SOURCE_DIR}/**/*.js`, {
+    //   ignore: IGNORE_PATTERNS,
+    // });
+    const files = await glob(path.join(SOURCE_DIR, "**/*.js"), {
       ignore: IGNORE_PATTERNS,
+      windowsPathsNoEscape: true, // 确保 Windows 路径解析正确
     });
 
     if (files.length === 0 && libFiles.length === 0) {

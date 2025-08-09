@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="NIX">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2023/08/03/promise/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript异步编程：从回调到Promise">
+<meta property="og:url" content="http://example.com/2023/08/03/Promise/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2023-08-03T09:34:06.000Z">
+<meta property="article:modified_time" content="2025-08-09T12:00:23.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="异步编程">
+<meta property="article:tag" content="回调">
+<meta property="article:tag" content="Promise">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/icon/favicon.svg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/icon/favicon.svg">
+    <meta name="theme-color" content="#C5B358">
+    <link rel="shortcut icon" href="/images/icon/favicon.svg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            JavaScript异步编程：从回调到Promise | NIX&#39;S SPACE
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":true,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":4,"number":false,"expand":true,"init_open":true},"copyright":{"enable":false,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#C5B358","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":true},"scroll_progress":{"bar":true,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":false,"site_pv":false,"site_uv":false,"post_pv":false},"single_page":true,"preloader":{"enable":false,"custom_message":null},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Hexo Theme Redefine, Redefine Your Hexo Journey."},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/background.png","dark":"/images/background-dark.png"},"title":"NIX'S SPACE","subtitle":{"text":[],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"style":"default","links":{"github":"https://nixs-space.github.io/","twitter":"https://x.com/nixs_space","email":"nixs.space@gmail.com"},"qrs":{"weixin":"https://nixs-space.github.io/images/weixin.png"}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#B8BC47","right":"#3D4D29","transparency":45},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tags"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about","Github":"https://github.com/nixs-space"}}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"info","announcement":null,"show_on_mobile":true,"links":{"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tags"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}}};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+		<span class="scroll-progress-bar"></span>
+	
+
+	
+		<span class="pjax-progress-bar"></span>
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+                <a class="logo-image h-8 w-8 sm:w-10 sm:h-10 mr-3" href="/">
+                    <img src="/images/icon/galaxy.svg" class="w-full h-full rounded-xs">
+                </a>
+            
+            <a class="logo-title" href="/">
+                
+                NIX&#39;S SPACE
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    ARCHIVES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/tags"
+                                        >
+                                    <i class="fa-regular fa-tags fa-fw"></i>
+                                    TAGS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    CATEGORIES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown"
+                                   href="#"
+                                        onClick=&#34;return false;&#34;>
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    ABOUT
+                                    <i class="fa-solid fa-chevron-down fa-fw"></i>
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                        
+                                            <li>
+                                                <a href="/about">
+                                                    ME
+                                                </a>
+                                            </li>
+                                        
+                                            <li>
+                                                <a target="_blank" rel="noopener" href="https://github.com/nixs-space">
+                                                    GITHUB
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                ARCHIVES
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/tags"
+                        >
+                            <span>
+                                TAGS
+                            </span>
+                            
+                                <i class="fa-regular fa-tags fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories"
+                        >
+                            <span>
+                                CATEGORIES
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item-sub text-base my-1.5 flex flex-col w-full">
+                        
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                             navbar-data-toggle="submenu-About"
+                        >
+                            <span>
+                                ABOUT
+                            </span>
+                            
+                                <i class="fa-solid fa-chevron-right fa-sm fa-fw transition-all"></i>
+                            
+                        </div>
+                        
+
+                        
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-About">
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="/about">ME</a>
+                                    </div>
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           target="_blank" rel="noopener" href="https://github.com/nixs-space">GITHUB</a>
+                                    </div>
+                                
+                            </div>
+                        
+                    </li>
+            
+
+            
+            
+                
+                    
+                    
+                    
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">3</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">1</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">1</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-5xl font-semibold px-2 sm:px-6 md:px-8 py-3">JavaScript异步编程：从回调到Promise</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">NIX</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2023-08-03 17:34:06</span>
+        <span class="mobile">2023-08-03 17:34:06</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-08-09 20:23</span>
+            <span class="mobile">2025-08-09 20:23</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/JavaScript/">JavaScript</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B/">异步编程</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/%E5%9B%9E%E8%B0%83/">回调</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/Promise/">Promise</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>4.2k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>17 Mins</span>
+        </span>
+    
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h2 id="什么是异步"><a href="#什么是异步" class="headerlink" title="什么是异步"></a>什么是异步</h2><p>先来看下面这样一个关于时间规划的小学数学题：</p>
+<blockquote>
+<p>题目：四年级小敏每天起床后要做的事情有：穿衣（3分钟），整理床铺（2分钟），洗脸梳头（8分钟），上厕所（5分钟），烧饭（20分钟），吃早饭（12分钟），完成这些工作要50分钟。你认为最合理的安排是多少分钟？</p>
+<p>答案：<br>6:00 起床<br>├─ 6:00-6:03 穿衣（3分钟）<br>├─ 6:03-6:05 整理床铺（2分钟）<br>├─ 6:05-6:25 烧饭（20分钟）<br>│   ├─ 6:05-6:13 洗脸梳头（8分钟） ← 和烧饭完全重叠<br>│   ╰─ 6:13-6:18 上厕所（5分钟）   ← 也在烧饭期间完成<br>╰─ 6:25-6:30 吃早饭（5分钟）</p>
+</blockquote>
+<p>题目很简单，我们也能很快的想到答案，烧饭是一件很耗时且不需要太多人工参与的事情，我们就可以利用这段时间去处理其他事情。但这和异步有什么关系呢？</p>
+<p>可以简单的说，像题目中这样：在同一时间段内，可以同时处理多件事情，不需要等前一个事情处理完成，才能处理下一个的场景，就是<code>异步</code>。在同一时间段内，只能处理一件事情，需要等待前一个事情处理完成后，才能开始处理下一个事情的场景，就是<code>同步</code>。</p>
+<p>在程序的世界里，也存在许多类似于<code>烧饭</code>的处理，例如：文件的I&#x2F;O处理、数据库操作等。在同步代码中，当一个任务（如读取文件、数据库查询）执行时，整个线程会被阻塞，无法处理其他请求，导致CPU空闲等待。这不仅会影响到用户的体验，还造成资源的浪费。</p>
+<p>而JavaScript 是单线程语言，同一时间只能执行一个任务，那该如何解决这个问题呢？</p>
+<h2 id="怎么实现异步"><a href="#怎么实现异步" class="headerlink" title="怎么实现异步"></a>怎么实现异步</h2><h3 id="回调函数"><a href="#回调函数" class="headerlink" title="回调函数"></a>回调函数</h3><p>有人可能会想到，我们可以使用回调函数来实现异步。<br>例如：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 代码中用毫秒代替分钟</span></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:05-6:13 洗脸梳头（8分钟）&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:13-6:18 上厕所（5分钟）&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 烧饭完成后</span></span><br><span class="line">        <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:25 饭烧好了&quot;</span>);</span><br><span class="line"></span><br><span class="line">        &#125;, <span class="number">20</span> - <span class="number">5</span> - <span class="number">8</span>); <span class="comment">// 烧饭时间减去已经过去的时间</span></span><br><span class="line">        </span><br><span class="line">    &#125;, <span class="number">8</span>); <span class="comment">// 洗脸梳头8分钟</span></span><br><span class="line">    </span><br><span class="line">&#125;, <span class="number">5</span>); <span class="comment">// 穿衣+整理床铺共5分钟</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">输出：</span></span><br><span class="line"><span class="comment">    6:05-6:13 洗脸梳头（8分钟）</span></span><br><span class="line"><span class="comment">    6:13-6:18 上厕所（5分钟）</span></span><br><span class="line"><span class="comment">    6:25 饭烧好了</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure></div>
+
+<p>但如果使用回调函数来描述整个场景呢？</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:00 起床&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:00-6:03 穿衣（3分钟）&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:03-6:05 整理床铺（2分钟）&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:05-6:25 开始烧饭（20分钟）&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 在烧饭期间并行执行其他任务</span></span><br><span class="line">        <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:05-6:13 洗脸梳头（8分钟）&quot;</span>);</span><br><span class="line">                </span><br><span class="line">            <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:13-6:18 上厕所（5分钟）&quot;</span>);</span><br><span class="line">                </span><br><span class="line">                <span class="comment">// 烧饭完成后</span></span><br><span class="line">                <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:25 饭烧好了&quot;</span>);</span><br><span class="line">                    </span><br><span class="line">                    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">                        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:25-6:30 吃早饭（5分钟）&quot;</span>);</span><br><span class="line">                        <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:30 所有任务完成&quot;</span>);</span><br><span class="line">                    &#125;, <span class="number">5</span>); <span class="comment">// 5分钟吃早饭</span></span><br><span class="line">                &#125;, <span class="number">20</span> - <span class="number">13</span>); <span class="comment">// 烧饭总时间减去已经过去的时间</span></span><br><span class="line">            &#125;, <span class="number">8</span>); <span class="comment">// 穿衣+整理床铺+洗脸梳头共13分钟</span></span><br><span class="line">        &#125;, <span class="number">5</span>); <span class="comment">// 穿衣+整理床铺共5分钟</span></span><br><span class="line">    &#125;, <span class="number">2</span>); <span class="comment">// 整理床铺2分钟</span></span><br><span class="line">&#125;, <span class="number">3</span>); <span class="comment">// 穿衣3分钟</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">输出：</span></span><br><span class="line"><span class="comment">	6:00 起床</span></span><br><span class="line"><span class="comment">    6:00-6:03 穿衣（3分钟）</span></span><br><span class="line"><span class="comment">    6:03-6:05 整理床铺（2分钟）</span></span><br><span class="line"><span class="comment">    6:05-6:25 开始烧饭（20分钟）</span></span><br><span class="line"><span class="comment">    6:05-6:13 洗脸梳头（8分钟）</span></span><br><span class="line"><span class="comment">    6:13-6:18 上厕所（5分钟）</span></span><br><span class="line"><span class="comment">    6:25 饭烧好了</span></span><br><span class="line"><span class="comment">    6:25-6:30 吃早饭（5分钟）</span></span><br><span class="line"><span class="comment">    6:30 所有任务完成</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure></div>
+
+<p>可以看到，函数嵌套的过深，不仅影响了代码的可读性，还会难以调试和维护。在JavaScript异步编程中，这种多层嵌套回调函数形成的复杂代码结构被称为<strong>回调地狱</strong>（Callback Hell）。</p>
+<blockquote>
+<p><strong>回调地狱（Callback Hell）</strong>，也称为<strong>金字塔厄运（Pyramid of Doom）</strong>，是指 JavaScript 中由于<strong>多层嵌套回调函数</strong>导致的代码结构复杂、难以维护的现象。</p>
+<p><strong>带来的问题</strong>：</p>
+<p>​	① 代码可读性差</p>
+<p>​	② 错误处理复杂</p>
+<p>​	③ 调试困难</p>
+<p>​	……</p>
+</blockquote>
+<p>但在实际的开发中，我们不可避免的会遇到这种复杂的业务场景，该怎么解决回调地狱的问题呢？</p>
+<h3 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h3><p>JavaScript中的一种异步编程模式，解决了回调地狱的问题，帮助开发者更清晰地处理异步操作，使代码更易读、易维护。</p>
+<h4 id="核心原理与工作机制"><a href="#核心原理与工作机制" class="headerlink" title="核心原理与工作机制"></a>核心原理与工作机制</h4><p>Promise 本质上是一个<strong>内置构造函数</strong>，用于创建 Promise 对象实例。每个 Promise 实例内部维护着两个关键属性：</p>
+<ol>
+<li><p><strong>PromiseState</strong>（状态机）：</p>
+<ul>
+<li><code>pending</code>：初始状态，表示异步操作正在进行中</li>
+<li><code>fulfilled</code>：操作成功完成（通过 resolve() 触发）</li>
+<li><code>rejected</code>：操作失败或被拒绝（通过 reject() 或抛出异常触发）</li>
+</ul>
+</li>
+<li><p><strong>PromiseResult</strong>（结果容器）：</p>
+<ul>
+<li>存储异步操作的返回值（resolve 传入的值）</li>
+<li>或存储错误信息（reject 传入的错误对象）</li>
+</ul>
+</li>
+</ol>
+<p><strong>状态转换规则</strong>：</p>
+<ul>
+<li>创建时自动初始化为 <code>pending</code> 状态</li>
+<li>通过 <code>resolve(value)</code> 转换为 <code>fulfilled</code>，并存储结果值</li>
+<li>通过 <code>reject(reason)</code> 或抛出异常转换为 <code>rejected</code>，并存储错误信息</li>
+<li>状态转换是<strong>单向且不可逆</strong>的，一旦确定就不可更改</li>
+</ul>
+<p><strong>执行流程</strong>：</p>
+<ol>
+<li>实例化 Promise 时，执行器函数（executor）立即执行</li>
+<li>通过 then() 方法注册回调：<ul>
+<li>当状态变为 <code>fulfilled</code>，触发第一个回调函数</li>
+<li>当状态变为 <code>rejected</code>，触发第二个回调函数（或 catch()）</li>
+</ul>
+</li>
+<li>通过 finally() 注册最终回调（无论成功失败都会执行）</li>
+</ol>
+<h4 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h4><ul>
+<li>避免回调地狱</li>
+<li>链式调用</li>
+<li>错误处理更简单</li>
+<li>…..</li>
+</ul>
+<h4 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h4><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	1. 创建一个 Promise 对象</span></span><br><span class="line"><span class="comment">	创建Promise时，构造函数接收一个执行器函数，在函数里写具体的处理逻辑，</span></span><br><span class="line"><span class="comment">	函数中有两个参数resolve/reject，这两个参数也是方法，在操作完成时调用。</span></span><br><span class="line"><span class="comment">	· resolve(value)：当异步操作成功时调用，存储成功信息。</span></span><br><span class="line"><span class="comment">	· reject(reason)：当异步操作失败时调用，存储错误信息。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">const</span> myPromise = <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">	<span class="comment">// 异步操作......</span></span><br><span class="line">    <span class="keyword">if</span>(condition) &#123;	<span class="comment">// 处理成功</span></span><br><span class="line">        <span class="title function_">resolve</span>(<span class="string">&quot;成功！&quot;</span>);	<span class="comment">// 调用 resolve</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;	<span class="comment">// 处理失败</span></span><br><span class="line">        <span class="title function_">reject</span>(<span class="string">&quot;失败！&quot;</span>); <span class="comment">// 调用 reject</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">	2. 使用 then/catch/finally 处理执行结果</span></span><br><span class="line"><span class="comment">        then(result): Promise成功时执行</span></span><br><span class="line"><span class="comment">            - 接收成功结果</span></span><br><span class="line"><span class="comment">            - 可返回新值（成为新Promise的resolve值）</span></span><br><span class="line"><span class="comment">            - 可链式调用</span></span><br><span class="line"><span class="comment">        catch(error): Promise失败时执行	</span></span><br><span class="line"><span class="comment">            - 专门处理错误</span></span><br><span class="line"><span class="comment">            - 可捕获前面所有then中的错误</span></span><br><span class="line"><span class="comment">            - 也能返回新值</span></span><br><span class="line"><span class="comment">        finally(): 无论成功失败都执行	</span></span><br><span class="line"><span class="comment">            - 不接收参数</span></span><br><span class="line"><span class="comment">            - 通常放在最后，用于清理操作</span></span><br><span class="line"><span class="comment">            - 不影响Promise链的最终值</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line">myPromise</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function">(<span class="params">result</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;成功结果:&quot;</span>, result);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;新的值&quot;</span>; <span class="comment">// 可传递给下一个then</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">catch</span>(<span class="function">(<span class="params">error</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&quot;失败原因:&quot;</span>, error);</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Error</span>(<span class="string">&quot;处理错误&quot;</span>); <span class="comment">// 可继续抛出错误</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">finally</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;无论成功失败都会执行&quot;</span>);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure></div>
+
+<h4 id="核心特点"><a href="#核心特点" class="headerlink" title="核心特点"></a>核心特点</h4><table>
+<thead>
+<tr>
+<th align="left"><strong>特性</strong></th>
+<th align="left"><strong>说明</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>状态不可逆</strong></td>
+<td align="left"><code>pending</code> → <code>fulfilled</code>（成功）或 <code>rejected</code>（失败）</td>
+</tr>
+<tr>
+<td align="left"><strong>链式调用</strong></td>
+<td align="left"><code>.then()</code> 返回新的 Promise，可继续 <code>.then()</code></td>
+</tr>
+<tr>
+<td align="left"><strong>错误冒泡</strong></td>
+<td align="left">错误会一直传递到最近的 <code>.catch()</code></td>
+</tr>
+<tr>
+<td align="left"><strong>微任务队列</strong></td>
+<td align="left">Promise 回调属于微任务（比 <code>setTimeout</code> 宏任务优先级高）</td>
+</tr>
+</tbody></table>
+<h4 id="常用方法"><a href="#常用方法" class="headerlink" title="常用方法"></a>常用方法</h4><p>以下是 Promise 静态方法的对比汇总表格：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>描述</th>
+<th>成功条件</th>
+<th>失败条件</th>
+<th>返回值</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Promise.resolve()</strong></td>
+<td>创建立即完成的Promise</td>
+<td>总是成功</td>
+<td>无</td>
+<td>传入的值</td>
+<td>快速包装值为Promise</td>
+</tr>
+<tr>
+<td><strong>Promise.reject()</strong></td>
+<td>创建立即拒绝的Promise</td>
+<td>无</td>
+<td>总是失败</td>
+<td>传入的错误</td>
+<td>快速创建拒绝的Promise</td>
+</tr>
+<tr>
+<td><strong>Promise.all()</strong></td>
+<td>处理多个Promise</td>
+<td>所有Promise成功</td>
+<td>任意一个失败</td>
+<td>结果数组（按输入顺序）</td>
+<td>一个失败立即拒绝，不等待其他</td>
+</tr>
+<tr>
+<td><strong>Promise.allSettled()</strong></td>
+<td>处理多个Promise</td>
+<td>所有Promise完成（无论成功失败）</td>
+<td>不会失败</td>
+<td>状态对象数组：<br><code>&#123;status: &#39;fulfilled&#39;, value&#125;</code><br><code>&#123;status: &#39;rejected&#39;, reason&#125;</code></td>
+<td>等待所有Promise最终状态</td>
+</tr>
+<tr>
+<td><strong>Promise.race()</strong></td>
+<td>处理多个Promise</td>
+<td>第一个完成的Promise（成功&#x2F;失败）</td>
+<td>第一个失败的Promise</td>
+<td>第一个完成的结果</td>
+<td>只关心最先完成的结果</td>
+</tr>
+<tr>
+<td><strong>Promise.any()</strong></td>
+<td>处理多个Promise</td>
+<td>任意一个Promise成功</td>
+<td>全部Promise失败</td>
+<td>第一个成功的结果</td>
+<td>忽略拒绝，只取第一个成功值</td>
+</tr>
+</tbody></table>
+<p><strong>示例代码：</strong></p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Promise.all</span></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">all</span>([p1, p2]).<span class="title function_">then</span>(<span class="function"><span class="params">results</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;所有成功:&#x27;</span>, results); <span class="comment">// [v1, v2]</span></span><br><span class="line">&#125;).<span class="title function_">catch</span>(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;首个失败:&#x27;</span>, err);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Promise.allSettled</span></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">allSettled</span>([p1, p2]).<span class="title function_">then</span>(<span class="function"><span class="params">results</span> =&gt;</span> &#123;</span><br><span class="line">  results.<span class="title function_">forEach</span>(<span class="function"><span class="params">result</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (result.<span class="property">status</span> === <span class="string">&#x27;fulfilled&#x27;</span>) &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;成功:&#x27;</span>, result.<span class="property">value</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;失败:&#x27;</span>, result.<span class="property">reason</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Promise.race</span></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">race</span>([p1, p2]).<span class="title function_">then</span>(<span class="function"><span class="params">winner</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;首个完成:&#x27;</span>, winner);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Promise.any</span></span><br><span class="line"><span class="title class_">Promise</span>.<span class="title function_">any</span>([p1, p2]).<span class="title function_">then</span>(<span class="function"><span class="params">firstSuccess</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;首个成功:&#x27;</span>, firstSuccess);</span><br><span class="line">&#125;).<span class="title function_">catch</span>(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;全部失败:&#x27;</span>, err.<span class="property">errors</span>); <span class="comment">// AggregateError</span></span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>使用场景建议：</strong></p>
+<ul>
+<li><strong>全成功才继续</strong>：用 <code>Promise.all</code></li>
+<li><strong>收集所有结果</strong>：用 <code>Promise.allSettled</code></li>
+<li><strong>竞速响应</strong>：用 <code>Promise.race</code></li>
+<li><strong>任一成功即可</strong>：用 <code>Promise.any</code></li>
+</ul>
+<h4 id="重构时间规划问题"><a href="#重构时间规划问题" class="headerlink" title="重构时间规划问题"></a>重构时间规划问题</h4><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建一个延迟执行的 Promise 辅助函数</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">delay</span>(<span class="params">taskName, minutes</span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">      <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;taskName&#125;</span>（<span class="subst">$&#123;minutes&#125;</span>分钟）`</span>);</span><br><span class="line">      <span class="title function_">resolve</span>();</span><br><span class="line">    &#125;, minutes); <span class="comment">// 用毫秒代替分钟，便于演示</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 主流程开始</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:00 起床&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 穿衣</span></span><br><span class="line"><span class="title function_">delay</span>(<span class="string">&quot;6:00-6:03 穿衣&quot;</span>, <span class="number">3</span>)</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 整理床铺</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">delay</span>(<span class="string">&quot;6:03-6:05 整理床铺&quot;</span>, <span class="number">2</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:05-6:25 开始烧饭（20分钟）&quot;</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 烧饭主任务</span></span><br><span class="line">    <span class="keyword">const</span> cooking = <span class="title function_">delay</span>(<span class="string">&quot;6:25 饭烧好了&quot;</span>, <span class="number">20</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 并行任务1: 洗脸梳头</span></span><br><span class="line">    <span class="keyword">const</span> faceWashing = <span class="title function_">delay</span>(<span class="string">&quot;6:05-6:13 洗脸梳头&quot;</span>, <span class="number">8</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 并行任务2: 上厕所（在洗脸梳头之后）</span></span><br><span class="line">    <span class="keyword">const</span> toilet = faceWashing.<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="title function_">delay</span>(<span class="string">&quot;6:13-6:18 上厕所&quot;</span>, <span class="number">5</span>));</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 等待所有并行任务完成</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title class_">Promise</span>.<span class="title function_">all</span>([cooking, toilet]);</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="comment">// 吃早饭</span></span><br><span class="line">    <span class="keyword">return</span> <span class="title function_">delay</span>(<span class="string">&quot;6:25-6:30 吃早饭&quot;</span>, <span class="number">5</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">then</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:30 所有任务完成&quot;</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="title function_">catch</span>(<span class="function"><span class="params">error</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&quot;流程出错:&quot;</span>, error);</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure></div>
+
+<p>虽然通过链式调用可以解决回调地狱的问题，但是我们还是可以看到then()中嵌套then()的现象，代码的可读性还是不够好。</p>
+<h3 id="async-await"><a href="#async-await" class="headerlink" title="async&#x2F;await"></a>async&#x2F;await</h3><h4 id="是什么？"><a href="#是什么？" class="headerlink" title="是什么？"></a>是什么？</h4><p>async&#x2F;await 是 ES2017 引入的<strong>语法糖</strong>，基于 Promise 的异步编程解决方案，让异步代码拥有同步代码的书写方式。</p>
+<p><strong>核心本质</strong>：</p>
+<ul>
+<li><code>async</code>：将函数标记为异步，总是返回 Promise 对象</li>
+<li><code>await</code>：暂停异步函数执行，等待 Promise 解决</li>
+</ul>
+<h4 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h4><p>通过async可以来创建一个异步函数，async函数会返回一个Promise对象。</p>
+<h5 id="1-声明异步函数"><a href="#1-声明异步函数" class="headerlink" title="1. 声明异步函数"></a>1. 声明异步函数</h5><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">fetchData</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="string">&#x27;data&#x27;</span>; <span class="comment">// 自动包装为 resolved Promise</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 等价于</span></span><br><span class="line"><span class="keyword">function</span> <span class="title function_">fetchData</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="title class_">Promise</span>.<span class="title function_">resolve</span>(<span class="string">&#x27;data&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h5 id="2-等待异步结果"><a href="#2-等待异步结果" class="headerlink" title="2. 等待异步结果"></a>2. 等待异步结果</h5><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">getUser</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> response = <span class="keyword">await</span> <span class="title function_">fetch</span>(<span class="string">&#x27;/api/user&#x27;</span>); <span class="comment">// 等待Promise解决</span></span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">await</span> response.<span class="title function_">json</span>(); <span class="comment">// 再次等待</span></span><br><span class="line">  <span class="keyword">return</span> data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h4 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h4><h5 id="1-使用范围"><a href="#1-使用范围" class="headerlink" title="1.使用范围"></a>1.使用范围</h5><p>await只能在async函数中使用，或ES模块的顶层作用域中使用。await阻塞的只是异步函数内部的代码，不会影响外部代码。</p>
+<blockquote>
+<p>ES模块的顶层作用域是什么？</p>
+<p>ES模块的顶层作用域指的是在模块的最外层，不在任何函数或类内部的代码块。这种情况下，顶层作用域的代码会在模块加载时立即执行。</p>
+<ul>
+<li>html中：</li>
+</ul>
+<div class="code-container" data-rel="Html"><figure class="iseeu highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">type</span>=<span class="string">&quot;module&quot;</span>&gt;</span><span class="language-javascript"></span></span><br><span class="line"><span class="language-javascript">    <span class="keyword">await</span> <span class="title class_">Promise</span>.<span class="title function_">resolve</span>().<span class="title function_">then</span>(<span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;Hello&quot;</span>));</span></span><br><span class="line"><span class="language-javascript"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure></div></blockquote>
+<h5 id="2-错误处理"><a href="#2-错误处理" class="headerlink" title="2. 错误处理"></a>2. 错误处理</h5><p>通过await调用异步代码时，需要通过try…catch来捕获异常</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方式1：try/catch</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">fetchWithTryCatch</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> data = <span class="keyword">await</span> <span class="title function_">fetchData</span>();</span><br><span class="line">  &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&#x27;捕获错误:&#x27;</span>, err);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方式2：catch回调</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">fetchWithCatch</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">await</span> <span class="title function_">fetchData</span>().<span class="title function_">catch</span>(<span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&#x27;捕获错误:&#x27;</span>, err);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h5 id="3-并行优化"><a href="#3-并行优化" class="headerlink" title="3. 并行优化"></a>3. 并行优化</h5><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 错误：顺序执行（耗时较长）</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">sequential</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> a = <span class="keyword">await</span> <span class="title function_">fetchA</span>(); <span class="comment">// 等待完成</span></span><br><span class="line">  <span class="keyword">const</span> b = <span class="keyword">await</span> <span class="title function_">fetchB</span>(); <span class="comment">// 才开始</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 正确：并行执行</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">parallel</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> [a, b] = <span class="keyword">await</span> <span class="title class_">Promise</span>.<span class="title function_">all</span>([<span class="title function_">fetchA</span>(), <span class="title function_">fetchB</span>()]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h4 id="常见陷阱"><a href="#常见陷阱" class="headerlink" title="常见陷阱"></a>常见陷阱</h4><ul>
+<li><p><strong>忘记await</strong>：导致后续代码使用未resolved的Promise</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">demo</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">const</span> data = <span class="title function_">fetchData</span>(); <span class="comment">// 缺少await！</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(data); <span class="comment">// 输出: Promise &#123;&lt;pending&gt;&#125;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li><p><strong>不必要await</strong>：同步操作无需await</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">unnecessary</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">await</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;这不需要await&#x27;</span>); <span class="comment">// 反模式</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li><p><strong>循环中使用</strong>：可能需要重构为for…of顺序执行</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">processArray</span>(<span class="params">array</span>) &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> item <span class="keyword">of</span> array) &#123; <span class="comment">// 替代forEach/map</span></span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">processItem</span>(item);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h4 id="重构时间规划问题-1"><a href="#重构时间规划问题-1" class="headerlink" title="重构时间规划问题"></a>重构时间规划问题</h4><div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 辅助函数：模拟延迟执行并记录时间</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">delay</span>(<span class="params">taskName, minutes</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Promise</span>(<span class="function"><span class="params">resolve</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="built_in">setTimeout</span>(<span class="function">() =&gt;</span> &#123;</span><br><span class="line">            <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`<span class="subst">$&#123;taskName&#125;</span>（<span class="subst">$&#123;minutes&#125;</span>分钟）`</span>);</span><br><span class="line">            <span class="title function_">resolve</span>();</span><br><span class="line">        &#125;, minutes); <span class="comment">// 用毫秒代替分钟，便于演示</span></span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 主流程</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">morningRoutine</span>(<span class="params"></span>) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`6:00 起床`</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 顺序执行穿衣和整理床铺</span></span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">delay</span>(<span class="string">&quot;6:00-6:03 穿衣&quot;</span>, <span class="number">3</span>);</span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">delay</span>(<span class="string">&quot;6:03-6:05 整理床铺&quot;</span>, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 开始烧饭并并行执行其他任务</span></span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">`6:05 开始烧饭（20分钟）`</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 并行执行的任务</span></span><br><span class="line">    <span class="keyword">const</span> tasks = [</span><br><span class="line">        <span class="comment">// 洗脸梳头（8分钟）和上厕所（5分钟）的链式调用</span></span><br><span class="line">        (<span class="title function_">async</span> () =&gt; &#123;</span><br><span class="line">            <span class="comment">// 洗脸梳头（8分钟）</span></span><br><span class="line">            <span class="keyword">await</span> <span class="title function_">delay</span>(<span class="string">&quot;6:05-6:13 洗脸梳头&quot;</span>, <span class="number">8</span>);<span class="comment">// 上厕所（5分钟）</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">await</span> <span class="title function_">delay</span>(<span class="string">&quot;6:13-6:18 上厕所&quot;</span>, <span class="number">5</span>);</span><br><span class="line">        &#125;)(),</span><br><span class="line">        <span class="comment">// 烧饭任务（20分钟）</span></span><br><span class="line">        <span class="title function_">delay</span>(<span class="string">&quot;6:25 饭烧好了&quot;</span>, <span class="number">20</span>)</span><br><span class="line">    ];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">await</span> <span class="title class_">Promise</span>.<span class="title function_">all</span>(tasks);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 吃早饭</span></span><br><span class="line">    <span class="keyword">await</span> <span class="title function_">delay</span>(<span class="string">&quot;6:25-6:30 吃早饭&quot;</span>, <span class="number">5</span>);</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&quot;6:30 所有任务完成&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 执行流程</span></span><br><span class="line"><span class="title function_">morningRoutine</span>().<span class="title function_">catch</span>(<span class="function"><span class="params">err</span> =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&quot;流程出错:&quot;</span>, err));</span><br></pre></td></tr></table></figure></div>
+
+<p>JS是单线程的，那么它是如何实现异步处理的呢？</p>
+<p>在深入探讨解决方案之前，让我们先理解一个概念：<strong>事件循环（Event Loop）</strong>。JavaScript 通过事件循环（Event Loop）机制，在保持单线程执行模型的同时，实现了异步操作的高效处理。下面我们将详细解析这一重要机制。</p>
+<h2 id="原理：事件循环（Event-Loop）"><a href="#原理：事件循环（Event-Loop）" class="headerlink" title="原理：事件循环（Event Loop）"></a>原理：事件循环（Event Loop）</h2><p><strong>事件循环</strong>是JavaScript中的一个的运行时模型，负责程序执行期间的资源管理、任务处理和协调操作，它定义了代码如何被调度和执行的。</p>
+<h4 id="关键组件"><a href="#关键组件" class="headerlink" title="关键组件"></a>关键组件</h4><table>
+<thead>
+<tr>
+<th align="left">组件</th>
+<th align="left">说明</th>
+<th>常见例子</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>调用栈（Call Stack）</strong></td>
+<td align="left">同步代码的执行栈，遵循后进先出（LIFO）。若栈溢出（如无限递归）会报错。</td>
+<td>同步代码（如 <code>console.log</code>）、<br>函数调用</td>
+</tr>
+<tr>
+<td align="left"><strong>任务队列（Task Queue）</strong></td>
+<td align="left">即<strong>宏任务队列</strong>，是事件循环中处理”常规”异步任务的队列。</td>
+<td><code>setTimeout</code>、<br><code>setInterval</code>、<br>DOM事件、<br>I&#x2F;O（如 <code>fs.readFile</code>）</td>
+</tr>
+<tr>
+<td align="left"><strong>微任务队列（Microtask Queue）</strong></td>
+<td align="left">存放微任务，<strong>每轮事件循环结束后立即清空</strong>，优先级高于宏任务。</td>
+<td><code>Promise.then</code>、<br><code>MutationObserver</code>、<br><code>queueMicrotask</code>、<br><code>process.nextTick</code>。</td>
+</tr>
+</tbody></table>
+<p>事件循环(Event Loop)关键组件示意图</p>
+<pre class="mermaid">flowchart TD
+    subgraph 队列
+        direction LR
+        subgraph 任务队列_宏任务队列["任务队列（宏任务队列）"]
+            H[setTimeout]
+            I[setInterval]
+            J[DOM事件]
+            K[I/O回调]
+        end
+        
+        subgraph 微任务队列["微任务队列"]
+            E[Promise.then]
+            F[queueMicrotask]
+            G[MutationObserver]
+        end
+    end
+    
+    subgraph 调用栈["调用栈"]
+        A[全局执行上下文] --> B[函数1]
+        B --> C[函数2]
+        C --> D[console.log]
+    end</pre>
+<h4 id="执行流程"><a href="#执行流程" class="headerlink" title="执行流程"></a>执行流程</h4><p><strong>简化的执行顺序</strong>：1. 同步代码 → 2. 微任务 → 3. 宏任务</p>
+<ol>
+<li><strong>调用栈检查阶段</strong><ul>
+<li>事件循环首先检查调用栈(Call Stack)状态</li>
+<li>若调用栈不为空，则继续执行栈中的同步代码</li>
+<li>若调用栈为空，则进入任务队列处理阶段</li>
+</ul>
+</li>
+<li><strong>微任务处理阶段</strong><ul>
+<li>当调用栈清空后，事件循环会优先处理微任务队列(Microtask Queue)</li>
+<li>依次执行微任务队列中的所有任务，直到队列完全清空</li>
+</ul>
+</li>
+<li><strong>宏任务处理阶段</strong><ul>
+<li>在微任务队列清空后，从宏任务队列(Macrotask Queue)中取出<strong>一个</strong>任务执行</li>
+<li>执行完毕后立即返回微任务检查阶段</li>
+</ul>
+</li>
+</ol>
+<p>上述过程形成持续的事件循环(Event Loop)，每次宏任务执行后都会重新检查微任务队列，这种机制保证了高优先级任务的及时处理。</p>
+<pre class="mermaid">flowchart TD
+    Start([开始]) --> Sync[执行同步代码]
+    Sync --> Micro{微任务队列空?}
+    Micro -->|否| ExecuteMicro[执行微任务] --> Micro
+    Micro -->|是| Macro{宏任务队列空?}
+    Macro -->|否| ExecuteMacro[执行宏任务] --> Sync
+    Macro -->|是| End([结束])</pre>
+
+
+
+<h4 id=""><a href="#" class="headerlink" title=""></a></h4><p>提交主题源码到博客的 Git 仓库（假设主题在 themes&#x2F;redefine-dev&#x2F;）</p>
+<p>git add themes&#x2F;redefine-dev&#x2F;<br>git commit -m “更新主题代码”<br>git push origin main</p>
+
+		</div>
+
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B/">#异步编程</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E5%9B%9E%E8%B0%83/">#回调</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/Promise/">#Promise</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+
+
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">JavaScript异步编程：从回调到Promise</div>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%BC%82%E6%AD%A5"><span class="nav-text">什么是异步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5"><span class="nav-text">怎么实现异步</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0"><span class="nav-text">回调函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Promise"><span class="nav-text">Promise</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6"><span class="nav-text">核心原理与工作机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E7%82%B9"><span class="nav-text">优点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-text">基本用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E7%89%B9%E7%82%B9"><span class="nav-text">核心特点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E6%96%B9%E6%B3%95"><span class="nav-text">常用方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E6%9E%84%E6%97%B6%E9%97%B4%E8%A7%84%E5%88%92%E9%97%AE%E9%A2%98"><span class="nav-text">重构时间规划问题</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#async-await"><span class="nav-text">async&#x2F;await</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-text">是什么？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%A8%E6%B3%95"><span class="nav-text">用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-text">注意事项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%99%B7%E9%98%B1"><span class="nav-text">常见陷阱</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%87%8D%E6%9E%84%E6%97%B6%E9%97%B4%E8%A7%84%E5%88%92%E9%97%AE%E9%A2%98-1"><span class="nav-text">重构时间规划问题</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8E%9F%E7%90%86%EF%BC%9A%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%EF%BC%88Event-Loop%EF%BC%89"><span class="nav-text">原理：事件循环（Event Loop）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E7%BB%84%E4%BB%B6"><span class="nav-text">关键组件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="nav-text">执行流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link"><span class="nav-text"></span></a></li></ol></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+            <div class="customize-info my-1">The more you know, the more you realize you don't know.</div>
+        
+        <div class="text-center">
+            &copy;
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-shield-cat"></i>&nbsp;&nbsp;<a href="/">NIX</a>
+            
+        </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog "></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Search..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        
+<script src="/js/build/libs/mermaid.min.js"></script>
+
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
