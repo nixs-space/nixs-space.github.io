@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="NIX">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2022/10/12/nodejs-modules/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Node.js 模块化详解：从 CommonJS 到 ES Modules">
+<meta property="og:url" content="http://example.com/2022/10/12/nodejs-modules/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2022-10-12T14:20:21.000Z">
+<meta property="article:modified_time" content="2022-10-12T14:20:21.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="模块化">
+<meta property="article:tag" content="CommonJS">
+<meta property="article:tag" content="ES Modules">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/icon/favicon.svg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/icon/favicon.svg">
+    <meta name="theme-color" content="#C5B358">
+    <link rel="shortcut icon" href="/images/icon/favicon.svg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            Node.js 模块化详解：从 CommonJS 到 ES Modules | NIX&#39;S SPACE
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":true,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":4,"number":false,"expand":true,"init_open":true},"copyright":{"enable":false,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#C5B358","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":true},"scroll_progress":{"bar":true,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":false,"site_pv":false,"site_uv":false,"post_pv":false},"single_page":true,"preloader":{"enable":false,"custom_message":null},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Hexo Theme Redefine, Redefine Your Hexo Journey."},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/background.webp","dark":"/images/background-dark.jpeg"},"title":"NIX'S SPACE","subtitle":{"text":[],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"style":"default","links":{"github":"https://nixs-space.github.io/","twitter":"https://x.com/nixs_space","email":"nixs.space@gmail.com"},"qrs":{"weixin":"https://nixs-space.github.io/images/weixin.png"}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#B8BC4773","right":"#3D4D2973","transparency":45},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tags"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about","Github":"https://github.com/nixs-space"}}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"info","announcement":null,"show_on_mobile":true,"links":{"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tags"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}}};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+		<span class="scroll-progress-bar"></span>
+	
+
+	
+		<span class="pjax-progress-bar"></span>
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+                <a class="logo-image h-8 w-8 sm:w-10 sm:h-10 mr-3" href="/">
+                    <img src="/images/icon/galaxy.svg" class="w-full h-full rounded-xs">
+                </a>
+            
+            <a class="logo-title" href="/">
+                
+                NIX&#39;S SPACE
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    ARCHIVES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/tags"
+                                        >
+                                    <i class="fa-regular fa-tags fa-fw"></i>
+                                    TAGS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    CATEGORIES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown"
+                                   href="#"
+                                        onClick=&#34;return false;&#34;>
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    ABOUT
+                                    <i class="fa-solid fa-chevron-down fa-fw"></i>
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                        
+                                            <li>
+                                                <a href="/about">
+                                                    ME
+                                                </a>
+                                            </li>
+                                        
+                                            <li>
+                                                <a target="_blank" rel="noopener" href="https://github.com/nixs-space">
+                                                    GITHUB
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                ARCHIVES
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/tags"
+                        >
+                            <span>
+                                TAGS
+                            </span>
+                            
+                                <i class="fa-regular fa-tags fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories"
+                        >
+                            <span>
+                                CATEGORIES
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item-sub text-base my-1.5 flex flex-col w-full">
+                        
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                             navbar-data-toggle="submenu-About"
+                        >
+                            <span>
+                                ABOUT
+                            </span>
+                            
+                                <i class="fa-solid fa-chevron-right fa-sm fa-fw transition-all"></i>
+                            
+                        </div>
+                        
+
+                        
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-About">
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="/about">ME</a>
+                                    </div>
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           target="_blank" rel="noopener" href="https://github.com/nixs-space">GITHUB</a>
+                                    </div>
+                                
+                            </div>
+                        
+                    </li>
+            
+
+            
+            
+                
+                    
+                    
+                    
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">6</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">3</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">3</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-5xl font-semibold px-2 sm:px-6 md:px-8 py-3">Node.js 模块化详解：从 CommonJS 到 ES Modules</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">NIX</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2022-10-12 22:20:21</span>
+        <span class="mobile">2022-10-12 22:20:21</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2022-10-12 22:20:21</span>
+            <span class="mobile">2022-10-12 22:20:21</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/Node-js/">Node.js</a>&nbsp;
+                        </li>
+                    
+                    
+                
+                    
+                        <li>
+                            | <a href="/categories/JavaScript-%E8%BF%9B%E9%98%B6/">JavaScript 进阶</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E6%A8%A1%E5%9D%97%E5%8C%96/">模块化</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/CommonJS/">CommonJS</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/ES-Modules/">ES Modules</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>4.7k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>21 Mins</span>
+        </span>
+    
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h2 id="1-模块化概述"><a href="#1-模块化概述" class="headerlink" title="1. 模块化概述"></a>1. 模块化概述</h2><h3 id="1-1-什么是模块化"><a href="#1-1-什么是模块化" class="headerlink" title="1.1 什么是模块化"></a>1.1 什么是模块化</h3><p>模块化是将代码分割成独立的模块，每个模块负责特定的功能或逻辑。这种编程范式将大型程序分解为相互依赖的小文件，提高了代码的可维护性、可重用性和可测试性。</p>
+<p><strong>模块化的核心优势：</strong></p>
+<ol>
+<li><strong>可维护性</strong>：每个模块独立存在，修改一个模块不会影响其他模块</li>
+<li><strong>可重用性</strong>：模块可以在不同项目中复用，减少重复代码</li>
+<li><strong>可测试性</strong>：模块可以单独测试，确保功能正确性</li>
+<li><strong>命名空间管理</strong>：避免全局变量污染，减少命名冲突</li>
+</ol>
+<h3 id="1-2-模块化的历史背景"><a href="#1-2-模块化的历史背景" class="headerlink" title="1.2 模块化的历史背景"></a>1.2 模块化的历史背景</h3><p>JavaScript 在浏览器端的模块化方式经历了从全局作用域到基于 <code>script</code> 标签的引用再到现代化的模块系统（如 ES6 模块）。然而，Node.js 的模块化是基于 CommonJS 规范开发的，这使得 Node.js 在服务器端也能够非常方便地实现模块化。</p>
+<h3 id="1-3-模块化解决的问题"><a href="#1-3-模块化解决的问题" class="headerlink" title="1.3 模块化解决的问题"></a>1.3 模块化解决的问题</h3><ol>
+<li><strong>命名冲突</strong>：传统JS开发中全局变量容易冲突，模块化提供了独立作用域</li>
+<li><strong>文件依赖</strong>：明确模块间的依赖关系，避免手动管理script标签顺序</li>
+<li><strong>代码组织</strong>：使项目结构更清晰，便于团队协作开发</li>
+</ol>
+<h2 id="2-CommonJS-模块规范"><a href="#2-CommonJS-模块规范" class="headerlink" title="2. CommonJS 模块规范"></a>2. CommonJS 模块规范</h2><h3 id="2-1-基本概念"><a href="#2-1-基本概念" class="headerlink" title="2.1 基本概念"></a>2.1 基本概念</h3><p>CommonJS是Node.js默认采用的模块化规范，主要特点包括：</p>
+<ul>
+<li>同步加载模块</li>
+<li>适用于服务端环境</li>
+<li>使用<code>require()</code>导入，<code>module.exports</code>或<code>exports</code>导出</li>
+</ul>
+<h3 id="2-2-基本用法"><a href="#2-2-基本用法" class="headerlink" title="2.2 基本用法"></a>2.2 基本用法</h3><p><strong>模块导入</strong></p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 导入自定义模块（需以./或../开头）</span></span><br><span class="line"><span class="keyword">const</span> m1 = <span class="built_in">require</span>(<span class="string">&#x27;./m1&#x27;</span>) <span class="comment">// 扩展名可省略</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 导入核心模块（直接写模块名）</span></span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;path&#x27;</span>)</span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;node:fs&#x27;</span>) <span class="comment">// node:前缀可提高查找效率</span></span><br></pre></td></tr></table></figure></div>
+
+<p><strong>文件查找规则：</strong></p>
+<ol>
+<li>完整文件名：直接加载</li>
+<li>省略扩展名：按<code>.js</code> → <code>.json</code> → <code>.node</code>顺序尝试</li>
+<li>目录作为模块：查找目录下的<code>index.js</code></li>
+</ol>
+<p><strong>模块导出</strong></p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title function_">add</span> = (<span class="params">a, b</span>) =&gt; a + b;</span><br><span class="line"><span class="keyword">const</span> <span class="title function_">multiply</span> = (<span class="params">a, b</span>) =&gt; a * b;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方式1：逐个导出</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">number</span> = <span class="number">1</span></span><br><span class="line"><span class="built_in">exports</span>.<span class="property">method</span> = <span class="keyword">function</span>(<span class="params"></span>) &#123;&#125;</span><br><span class="line"><span class="built_in">exports</span>.<span class="property">add</span> = add; </span><br><span class="line"><span class="built_in">exports</span>.<span class="property">multiply</span> = multiply;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 方式2：整体导出</span></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">  <span class="attr">name</span>: <span class="string">&#x27;zs&#x27;</span>,</span><br><span class="line">  <span class="attr">age</span>: <span class="number">25</span>,</span><br><span class="line">  add, </span><br><span class="line">  multiply</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>注意</strong>：<code>exports</code>只是<code>module.exports</code>的引用，不能直接赋值：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exports</span> = &#123;<span class="attr">a</span>: <span class="number">1</span>&#125; <span class="comment">// 错误！不会生效</span></span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="2-3-模块加载原理"><a href="#2-3-模块加载原理" class="headerlink" title="2.3 模块加载原理"></a>2.3 模块加载原理</h3><p>Node.js 在加载一个 CommonJS 模块（如 require(‘.&#x2F;module.js’)）时，会将该模块的代码包裹在一个函数里，并传入 5 个关键参数：</p>
+<ul>
+<li>exports：用于导出模块内容（等同于 module.exports 的引用）。</li>
+<li>require：用于引入其他模块的函数。</li>
+<li>module：当前模块的元信息（如 module.exports）。</li>
+<li>__filename：当前模块文件的绝对路径。</li>
+<li>__dirname：当前模块所在目录的绝对路径。</li>
+</ul>
+<p><strong>示例代码</strong><br>假设有一个模块文件 math.js：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// math.js</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="variable language_">arguments</span>); <span class="comment">// 查看包装函数的参数</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="title function_">add</span> = (<span class="params">a, b</span>) =&gt; a + b;</span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = add; <span class="comment">// 导出 add 函数</span></span><br></pre></td></tr></table></figure></div>
+<p>当你在另一个文件 app.js 中引入它：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// app.js</span></span><br><span class="line"><span class="keyword">const</span> add = <span class="built_in">require</span>(<span class="string">&#x27;./math.js&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="title function_">add</span>(<span class="number">2</span>, <span class="number">3</span>)); <span class="comment">// 输出 5</span></span><br></pre></td></tr></table></figure></div>
+<p>运行 app.js 时，math.js 会被包装成：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">(<span class="keyword">function</span>(<span class="params"><span class="built_in">exports</span>, <span class="built_in">require</span>, <span class="variable language_">module</span>, __filename, __dirname</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="variable language_">arguments</span>); <span class="comment">// 输出包装函数的参数</span></span><br><span class="line">  <span class="keyword">const</span> <span class="title function_">add</span> = (<span class="params">a, b</span>) =&gt; a + b;</span><br><span class="line">  <span class="variable language_">module</span>.<span class="property">exports</span> = add;</span><br><span class="line">&#125;)(...); <span class="comment">// Node.js 会自动传入 5 个参数</span></span><br></pre></td></tr></table></figure></div>
+<p>可以通过<code>console.log(arguments)</code>查看这些参数。<br>输出示例：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">&#x27;0&#x27;</span>: &#123;&#125;,               <span class="comment">// exports（初始为空对象）</span></span><br><span class="line">  <span class="string">&#x27;1&#x27;</span>: [<span class="title class_">Function</span>: <span class="built_in">require</span>], <span class="comment">// require 函数</span></span><br><span class="line">  <span class="string">&#x27;2&#x27;</span>: <span class="title class_">Module</span> &#123; ... &#125;,   <span class="comment">// module 对象</span></span><br><span class="line">  <span class="string">&#x27;3&#x27;</span>: <span class="string">&#x27;/path/to/math.js&#x27;</span>, <span class="comment">// __filename</span></span><br><span class="line">  <span class="string">&#x27;4&#x27;</span>: <span class="string">&#x27;/path/to&#x27;</span>         <span class="comment">// __dirname</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="2-4-文件夹作为模块"><a href="#2-4-文件夹作为模块" class="headerlink" title="2.4 文件夹作为模块"></a>2.4 文件夹作为模块</h3><p>当 <code>require</code> 的是一个目录时，Node.js 会按顺序查找：</p>
+<ol>
+<li>package.json 的 main 字段：指定入口文件。</li>
+<li>index.js：如果 package.json 不存在或未指定 main。</li>
+</ol>
+<p><strong>示例 1：目录包含 package.json</strong><br>假设目录结构如下：</p>
+<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hello/</span><br><span class="line">  ├── package.json</span><br><span class="line">  ├── a.js</span><br><span class="line">  └── b.js</span><br></pre></td></tr></table></figure></div>
+<p>package.json 内容：</p>
+<div class="code-container" data-rel="Json"><figure class="iseeu highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;main&quot;</span><span class="punctuation">:</span> <span class="string">&quot;a.js&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure></div>
+<p>当你 require(‘.&#x2F;hello’) 时，实际加载的是 hello&#x2F;a.js。</p>
+<p><strong>示例 2：目录不包含 package.json</strong><br>目录结构：</p>
+<div class="code-container" data-rel="Text"><figure class="iseeu highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">hello/</span><br><span class="line">  ├── index.js</span><br><span class="line">  ├── a.js</span><br><span class="line">  └── b.js</span><br></pre></td></tr></table></figure></div>
+<p>当你 require(‘.&#x2F;hello’) 时，默认加载 hello&#x2F;index.js。</p>
+<p><strong>示例 3：既无 package.json 也无 index.js</strong><br>会报错：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Error: Cannot find module <span class="string">&#x27;./hello&#x27;</span></span><br></pre></td></tr></table></figure></div>
+
+
+
+<h2 id="3-ES-Modules-简介"><a href="#3-ES-Modules-简介" class="headerlink" title="3. ES Modules 简介"></a>3. ES Modules 简介</h2><h3 id="3-1-基本概念"><a href="#3-1-基本概念" class="headerlink" title="3.1 基本概念"></a>3.1 基本概念</h3><p><strong>ES Modules (ESM)</strong> 是 JavaScript 的官方模块标准（ECMAScript 2015 引入），用于替代传统的 CommonJS（Node.js 原生的 <code>require</code> 语法）。</p>
+<ul>
+<li><strong>设计目标</strong>：实现静态化模块依赖，支持异步加载，适合浏览器和服务器端。</li>
+<li><strong>核心优势</strong>：<ul>
+<li>静态分析（编译时确定依赖关系，利于优化）。</li>
+<li>原生浏览器支持（无需打包工具即可直接使用）。</li>
+<li>异步加载（更适合现代应用）。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-2-基本用法"><a href="#3-2-基本用法" class="headerlink" title="3.2 基本用法"></a>3.2 基本用法</h3><p>使用ES 模块时，文件扩展名需要改为 <code>.mjs</code>；如想使用 <code>.js</code> 作为文件扩展名，需要在 <code>package.json</code> 中声明 <code>&quot;type&quot;: &quot;module&quot;</code>。</p>
+<p><strong>模块导入</strong></p>
+<ul>
+<li><p><strong>导入命名导出</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; add, <span class="variable constant_">PI</span> &#125; <span class="keyword">from</span> <span class="string">&#x27;./math.js&#x27;</span>;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li><p><strong>导入默认导出</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> log <span class="keyword">from</span> <span class="string">&#x27;./utils.js&#x27;</span>;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li><p><strong>混合导入</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> log, &#123; add &#125; <span class="keyword">from</span> <span class="string">&#x27;./combined.js&#x27;</span>;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li><p><strong>动态导入</strong>（返回 Promise）：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="variable language_">module</span> = <span class="keyword">await</span> <span class="keyword">import</span>(<span class="string">&#x27;./module.js&#x27;</span>);</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<p><strong>模块导出</strong></p>
+<ul>
+<li><p><strong>命名导出</strong>：导出多个值。</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// math.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="title function_">add</span> = (<span class="params">a, b</span>) =&gt; a + b;</span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="variable constant_">PI</span> = <span class="number">3.14</span>;</span><br></pre></td></tr></table></figure></div>
+</li>
+<li><p><strong>默认导出</strong>：导出一个主要值。</p>
+<blockquote>
+<p>每个文件只能有一个默认导出</p>
+</blockquote>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// utils.js</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="keyword">function</span> <span class="title function_">log</span>(<span class="params">message</span>) &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(message);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h3 id="3-3-注意事项"><a href="#3-3-注意事项" class="headerlink" title="3.3 注意事项"></a>3.3 注意事项</h3><p><strong>(1) 文件扩展名和路径</strong></p>
+<ul>
+<li><strong>必须显式指定扩展名</strong>（如 <code>&#39;./math.js&#39;</code>，不能省略 <code>.js</code>）。</li>
+<li><strong>目录索引文件</strong>需完整路径（如 <code>&#39;./dir/index.js&#39;</code>，不能简写为 <code>&#39;./dir&#39;</code>）。</li>
+</ul>
+<blockquote>
+<p>可以通过配置打包工具（如 Webpack&#x2F;Rollup&#x2F;Vite）的配置文件，配置扩展名和路径</p>
+<p>例如：通过配置 <code>resolve.extensions</code> 和 <code>resolve.mainFiles</code> 实现：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// webpack.config.js</span></span><br><span class="line"><span class="variable language_">module</span>.<span class="property">exports</span> = &#123;</span><br><span class="line">  <span class="attr">resolve</span>: &#123;</span><br><span class="line">    <span class="attr">extensions</span>: [<span class="string">&#x27;.js&#x27;</span>, <span class="string">&#x27;.mjs&#x27;</span>], <span class="comment">// 自动补全扩展名</span></span><br><span class="line">    <span class="attr">mainFiles</span>: [<span class="string">&#x27;index&#x27;</span>],        <span class="comment">// 自动解析目录下的 index 文件</span></span><br><span class="line">  &#125;,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div></blockquote>
+<p><strong>(2) 顶层 <code>await</code></strong></p>
+<ul>
+<li><p><strong>ESM 中支持顶层 <code>await</code></strong>（无需包裹在异步函数中）：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// app.mjs</span></span><br><span class="line"><span class="keyword">const</span> data = <span class="keyword">await</span> <span class="title function_">fetchData</span>(); <span class="comment">// 直接使用</span></span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<p><strong>(3) 默认严格模式</strong></p>
+<ul>
+<li>ESM 中代码默认启用严格模式（无需 <code>&quot;use strict&quot;</code>）。</li>
+</ul>
+<h2 id="4-CommonJS-VS-ES-Modules"><a href="#4-CommonJS-VS-ES-Modules" class="headerlink" title="4. CommonJS VS ES Modules"></a>4. CommonJS VS ES Modules</h2><p>在 Node.js 中，<code>require()</code> 和 <code>import</code> 是两种不同的模块系统（CommonJS 和 ES Modules），它们的加载机制有本质区别。以下是两个模块系统的比较：</p>
+<h3 id="4-1-require-是同步的，无法直接加载-ES-模块"><a href="#4-1-require-是同步的，无法直接加载-ES-模块" class="headerlink" title="4.1 require() 是同步的，无法直接加载 ES 模块"></a><strong>4.1 <code>require()</code> 是同步的，无法直接加载 ES 模块</strong></h3><ul>
+<li><p><strong>CommonJS 的 <code>require()</code></strong>  </p>
+<ul>
+<li>是同步阻塞的（模块加载完成后才会执行后续代码）。</li>
+<li>只能加载 <code>.js</code>、<code>.json</code>、<code>.node</code> 等文件，<strong>默认不支持 <code>.mjs</code>（ES 模块）</strong>。</li>
+<li>如果直接 <code>require(&#39;./es-module.mjs&#39;)</code> 会报错：<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Error [ERR_REQUIRE_ESM]: Must use import to load ES Module</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+</li>
+<li><p><strong>ES Modules 的 <code>import</code></strong>  </p>
+<ul>
+<li>是异步的（底层使用 Promise）。</li>
+<li>必须用于 <code>.mjs</code> 文件或 <code>package.json</code> 中声明 <code>&quot;type&quot;: &quot;module&quot;</code> 的 <code>.js</code> 文件。</li>
+</ul>
+</li>
+</ul>
+<h3 id="4-2-在-CommonJS-中加载-ES-模块的方法"><a href="#4-2-在-CommonJS-中加载-ES-模块的方法" class="headerlink" title="4.2 在 CommonJS 中加载 ES 模块的方法"></a><strong>4.2 在 CommonJS 中加载 ES 模块的方法</strong></h3><p>由于 <code>require()</code> 无法直接加载 ES 模块，Node.js 提供了两种解决方案：</p>
+<p><strong>方法 1：动态 <code>import()</code> 函数（推荐）</strong></p>
+<ul>
+<li><p><code>import()</code> 是 ES 模块的异步加载语法，返回一个 Promise，<strong>可在 CommonJS 中使用</strong>。</p>
+</li>
+<li><p>示例：</p>
+<p><strong>ES 模块（被加载方）</strong></p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// es-module.mjs</span></span><br><span class="line"><span class="keyword">export</span> <span class="keyword">const</span> <span class="title function_">hello</span> = (<span class="params"></span>) =&gt; <span class="string">&quot;Hello from ES Module&quot;</span>;</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>CommonJS 文件（加载方）</strong></p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// commonjs-app.js</span></span><br><span class="line">(<span class="title function_">async</span> () =&gt; &#123;</span><br><span class="line">  <span class="keyword">const</span> esModule = <span class="keyword">await</span> <span class="keyword">import</span>(<span class="string">&#x27;./es-module.mjs&#x27;</span>);</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(esModule.<span class="title function_">hello</span>()); <span class="comment">// 输出: &quot;Hello from ES Module&quot;</span></span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<p><strong>方法 2：通过 <code>module.createRequire</code> 创建自定义 <code>require</code>（复杂场景）</strong></p>
+<ul>
+<li>适用于需要动态控制模块加载路径的情况：<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// commonjs-app.js</span></span><br><span class="line"><span class="keyword">import</span> &#123; createRequire &#125; <span class="keyword">from</span> <span class="string">&#x27;module&#x27;</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="built_in">require</span> = <span class="title function_">createRequire</span>(<span class="keyword">import</span>.<span class="property">meta</span>.<span class="property">url</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 此时 require 仍无法加载 ES 模块，但可以加载其他 CommonJS 模块</span></span><br><span class="line"><span class="keyword">const</span> cjsModule = <span class="built_in">require</span>(<span class="string">&#x27;./commonjs-module.js&#x27;</span>);</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h2 id="5-Node-js核心模块"><a href="#5-Node-js核心模块" class="headerlink" title="5. Node.js核心模块"></a>5. Node.js核心模块</h2><h3 id="5-1-global对象"><a href="#5-1-global对象" class="headerlink" title="5.1 global对象"></a>5.1 global对象</h3><p>Node.js中的全局对象，用来存储全局变量：</p>
+<ul>
+<li><code>global</code>：Node.js全局对象（类似浏览器的window）</li>
+<li><code>globalThis</code>：ES标准全局对象名称，Node.js中等于global</li>
+</ul>
+<p><strong>与浏览器 <code>window</code> 对象的区别</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left"><strong>特性</strong></th>
+<th align="left"><strong>Node.js <code>global</code></strong></th>
+<th align="left"><strong>浏览器 <code>window</code></strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>作用域</strong></td>
+<td align="left">整个 Node.js 进程</td>
+<td align="left">当前浏览器标签页</td>
+</tr>
+<tr>
+<td align="left"><strong>特有 API</strong></td>
+<td align="left"><code>process</code>, <code>Buffer</code>, <code>__dirname</code></td>
+<td align="left"><code>document</code>, <code>location</code>, <code>alert</code></td>
+</tr>
+<tr>
+<td align="left"><strong>模块系统影响</strong></td>
+<td align="left">受 CommonJS&#x2F;ESM 规则约束</td>
+<td align="left">直接暴露全局变量</td>
+</tr>
+</tbody></table>
+<h3 id="5-2-dirname全局变量"><a href="#5-2-dirname全局变量" class="headerlink" title="5.2 __dirname全局变量"></a>5.2 __dirname全局变量</h3><p><code>__dirname</code> 是 Node.js 中的一个 <strong>全局变量</strong>，表示 <strong>当前执行脚本所在的目录的绝对路径</strong>。它是 CommonJS 模块系统的一部分，在 ES Modules（<code>import/export</code>）中不能直接使用。</p>
+<p><strong>基本用法</strong>:</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(__dirname);</span><br><span class="line"><span class="comment">// 输出示例（Windows）: &#x27;C:\\Users\\yourname\\project\\src&#x27;</span></span><br><span class="line"><span class="comment">// 输出示例（Linux/macOS）: &#x27;/home/yourname/project/src&#x27;</span></span><br></pre></td></tr></table></figure></div>
+<ul>
+<li>始终返回 <strong>当前文件的目录路径</strong>（绝对路径）。</li>
+<li>不受 <code>process.cwd()</code>（工作目录）影响。</li>
+</ul>
+<p> <strong><code>__dirname</code> 在 ES Modules 中的替代方案</strong>:</p>
+<p>在 ES Modules（<code>import/export</code>）中，<code>__dirname</code> <strong>不可用</strong>，需要使用以下方式替代：</p>
+<p><strong>替代方案 ：<code>import.meta.url</code> + <code>fileURLToPath</code></strong></p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; fileURLToPath &#125; <span class="keyword">from</span> <span class="string">&#x27;node:url&#x27;</span>;</span><br><span class="line"><span class="keyword">import</span> &#123; dirname &#125; <span class="keyword">from</span> <span class="string">&#x27;node:path&#x27;</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// import.meta.url: 当前文件的 URL（ESM）</span></span><br><span class="line"><span class="keyword">const</span> __filename = <span class="title function_">fileURLToPath</span>(<span class="keyword">import</span>.<span class="property">meta</span>.<span class="property">url</span>); <span class="comment">// 获取当前文件的绝对路径</span></span><br><span class="line"><span class="keyword">const</span> __dirname = <span class="title function_">dirname</span>(__filename); <span class="comment">// 提取目录部分</span></span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(__dirname); <span class="comment">// 输出当前文件目录</span></span><br></pre></td></tr></table></figure></div>
+
+
+<h3 id="5-3-process模块"><a href="#5-3-process模块" class="headerlink" title="5.3 process模块"></a>5.3 process模块</h3><p><code>process</code> 是 Node.js 的一个核心全局对象，提供了与当前 Node.js 进程交互的多种功能和方法。它不需要通过 <code>require()</code> 导入即可使用。</p>
+<p><strong><code>process</code> 常用方法和属性</strong></p>
+<table>
+<thead>
+<tr>
+<th><strong>分类</strong></th>
+<th><strong>属性&#x2F;方法</strong></th>
+<th><strong>类型</strong></th>
+<th><strong>说明</strong></th>
+<th><strong>示例</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>进程信息</strong></td>
+<td><code>process.pid</code></td>
+<td>属性</td>
+<td>当前进程的 PID</td>
+<td><code>console.log(process.pid); // 12345</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>process.platform</code></td>
+<td>属性</td>
+<td>操作系统平台 (<code>&#39;win32&#39;</code>, <code>&#39;linux&#39;</code>, <code>&#39;darwin&#39;</code>)</td>
+<td><code>if (process.platform === &#39;win32&#39;) &#123; ... &#125;</code></td>
+</tr>
+<tr>
+<td></td>
+<td><code>process.arch</code></td>
+<td>属性</td>
+<td>CPU 架构 (<code>&#39;x64&#39;</code>, <code>&#39;arm&#39;</code>)</td>
+<td><code>console.log(process.arch); // &#39;x64&#39;</code></td>
+</tr>
+<tr>
+<td><strong>命令行参数</strong></td>
+<td><code>process.argv</code></td>
+<td>属性（数组）</td>
+<td>命令行参数（<code>[node路径, 脚本路径, ...args]</code>）</td>
+<td><code>node app.js arg1</code> → <code>process.argv[2] === &#39;arg1&#39;</code></td>
+</tr>
+<tr>
+<td><strong>环境变量</strong></td>
+<td><code>process.env</code></td>
+<td>属性（对象）</td>
+<td>环境变量对象</td>
+<td><code>console.log(process.env.NODE_ENV); // &#39;development&#39;</code></td>
+</tr>
+<tr>
+<td><strong>进程控制</strong></td>
+<td><code>process.exit([code])</code></td>
+<td>方法</td>
+<td>退出进程（默认 <code>code=0</code>，非 0 表示失败）</td>
+<td><code>if (err) process.exit(1);</code></td>
+</tr>
+</tbody></table>
+<h3 id="5-4-path模块"><a href="#5-4-path模块" class="headerlink" title="5.4 path模块"></a>5.4 path模块</h3><p>用于处理文件和目录路径的核心模块：</p>
+<p><strong>常用方法</strong>：</p>
+<ul>
+<li><code>path.join([...paths])</code>：将多个路径片段合并成一个路径</li>
+<li><code>path.resolve([...paths])</code>：将多个路径片段解析成一个<strong>绝对路径</strong></li>
+<li><code>path.basename(path)</code>：返回路径的最后一部分</li>
+<li><code>path.dirname(path)</code>：返回路径的目录部分</li>
+<li><code>path.extname(path)</code>：返回文件的扩展名</li>
+<li><code>path.parse(path);</code>: 解析路径</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// const path = require(&#x27;path&#x27;);</span></span><br><span class="line"><span class="keyword">const</span> path = <span class="built_in">require</span>(<span class="string">&#x27;node:path&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 合并路径</span></span><br><span class="line"><span class="keyword">const</span> fullPath = path.<span class="title function_">join</span>(<span class="string">&#x27;folder&#x27;</span>, <span class="string">&#x27;subfolder&#x27;</span>, <span class="string">&#x27;file.txt&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(fullPath);  <span class="comment">// folder/subfolder/file.txt</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取绝对路径</span></span><br><span class="line">path.<span class="title function_">resolve</span>(__dirname, <span class="string">&#x27;./m1.js&#x27;</span>) </span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取文件名</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(path.<span class="title function_">basename</span>(<span class="string">&#x27;/home/user/file.txt&#x27;</span>));  <span class="comment">// file.txt</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 获取文件扩展名</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(path.<span class="title function_">extname</span>(<span class="string">&#x27;index.html&#x27;</span>));  <span class="comment">// .html</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 解析路径</span></span><br><span class="line"><span class="keyword">const</span> pathObj = path.<span class="title function_">parse</span>(<span class="string">&#x27;/public/images/logo.png&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(pathObj);</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">&#123;</span></span><br><span class="line"><span class="comment">  root: &#x27;/&#x27;,</span></span><br><span class="line"><span class="comment">  dir: &#x27;/public/images&#x27;,</span></span><br><span class="line"><span class="comment">  base: &#x27;logo.png&#x27;,</span></span><br><span class="line"><span class="comment">  ext: &#x27;.png&#x27;,</span></span><br><span class="line"><span class="comment">  name: &#x27;logo&#x27;</span></span><br><span class="line"><span class="comment">&#125;</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure></div>
+
+<p><strong>注意</strong>：</p>
+<ol>
+<li><p>工作目录(<code>cwd</code>)可能因执行方式不同而变化：</p>
+<ul>
+<li><p>VS Code调试执行：项目根目录</p>
+</li>
+<li><p>命令行执行：当前脚本所在目录</p>
+</li>
+</ul>
+</li>
+<li><p><code>require(&#39;path&#39;)</code> 和 <code>require(&#39;node:path&#39;)</code></p>
+<table>
+<thead>
+<tr>
+<th align="left">方式</th>
+<th align="left">含义</th>
+<th align="left">是否强制加载核心模块</th>
+<th align="left">Node.js 版本要求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>require(&#39;path&#39;)</code></td>
+<td align="left">传统方式引入 <code>path</code> 模块</td>
+<td align="left">可能被同名第三方模块覆盖</td>
+<td align="left">所有版本</td>
+</tr>
+<tr>
+<td align="left"><code>require(&#39;node:path&#39;)</code></td>
+<td align="left">显式引入 Node.js 核心 <code>path</code> 模块</td>
+<td align="left">确保加载核心模块</td>
+<td align="left">Node.js ≥ 14.18.0</td>
+</tr>
+</tbody></table>
+</li>
+</ol>
+<h3 id="5-5-fs模块"><a href="#5-5-fs模块" class="headerlink" title="5.5 fs模块"></a>5.5 fs模块</h3><p>用于与文件系统交互，可以进行文件的读取、写入、删除等操作。提供同步&#x2F;异步API：</p>
+<p><strong>常用方法</strong>：</p>
+<ul>
+<li><code>fs.readFile(path[, options], callback)</code> - 读取文件</li>
+<li><code>fs.appendFile(path, data[, options], callback)</code> - 追加内容</li>
+<li><code>fs.mkdir(path[, options], callback)</code> - 创建目录</li>
+<li><code>fs.rm(path[, options], callback)</code> - 删除文件&#x2F;目录</li>
+<li><code>fs.rename(oldPath, newPath, callback)</code> - 重命名&#x2F;移动</li>
+<li><code>fs.copyFile(src, dest[, mode], callback)</code> - 复制文件</li>
+</ul>
+<p><strong>示例1</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 异步读取文件</span></span><br><span class="line">fs.<span class="title function_">readFile</span>(<span class="string">&#x27;example.txt&#x27;</span>, <span class="string">&#x27;utf8&#x27;</span>, <span class="function">(<span class="params">err, data</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (err) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(err);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 同步读取文件</span></span><br><span class="line"><span class="keyword">const</span> data = fs.<span class="title function_">readFileSync</span>(<span class="string">&#x27;example.txt&#x27;</span>, <span class="string">&#x27;utf8&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(data);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写入文件</span></span><br><span class="line">fs.<span class="title function_">writeFile</span>(<span class="string">&#x27;example.txt&#x27;</span>, <span class="string">&#x27;An apple a day&#x27;</span>, <span class="function"><span class="params">err</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (err) <span class="variable language_">console</span>.<span class="title function_">error</span>(err);</span><br><span class="line">  <span class="keyword">else</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;成功写入文件!&#x27;</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>示例2</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs/promises&#x27;</span>) <span class="comment">// Promise版本（推荐使用）</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 异步读取文件（推荐）</span></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">function</span> <span class="title function_">readFile</span>(<span class="params"></span>) &#123;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> buffer = <span class="keyword">await</span> fs.<span class="title function_">readFile</span>(path.<span class="title function_">resolve</span>(__dirname, <span class="string">&#x27;./readme.txt&#x27;</span>))</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(buffer.<span class="title function_">toString</span>())</span><br><span class="line">  &#125; <span class="keyword">catch</span> (error) &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(error)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="5-6-HTTP模块"><a href="#5-6-HTTP模块" class="headerlink" title="5.6 HTTP模块"></a>5.6 HTTP模块</h3><p>用于创建 HTTP 服务和客户端请求，处理 Web 服务器相关的操作。</p>
+<p><strong>常用方法：</strong></p>
+<ul>
+<li><code>http.createServer(callback)</code>：创建一个 HTTP 服务器</li>
+<li><code>http.get(options, callback)</code>：发起 HTTP GET 请求</li>
+<li><code>http.request(options, callback)</code>：发起 HTTP 请求（支持更多方法，如 POST）</li>
+<li><code>request.method</code>：获取HTTP 方法（<code>GET</code>, <code>POST</code>, <code>PUT</code> 等）</li>
+<li><code>request.url</code>：获取请求的 URL（不包括域名）</li>
+<li><code>request.headers</code>：获取请求头（对象形式）</li>
+<li><code>request.on(&#39;data&#39;, callback)</code>： 接收请求体数据（<code>POST/PUT</code>）</li>
+<li><code>request.on(&#39;end&#39;, callback)</code>：请求体接收完毕</li>
+<li><code>request.pipe(destination)	</code>：将请求数据流式传输到其他流</li>
+<li><code>response.setHeader(name, value)</code>：设置单个响应头</li>
+<li><code>response.writeHead(statusCode, headers)</code>：设置状态码和多个响应头</li>
+<li><code>response.write(data)</code>：向客户端响应数据</li>
+<li><code>response.statusCode</code>：设置状态码（默认 <code>200</code>）</li>
+<li><code>response.end()</code>：结束响应</li>
+</ul>
+<p><strong>示例1</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;node:http&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建一个简单的 HTTP 服务器</span></span><br><span class="line">http.<span class="title function_">createServer</span>(<span class="function">(<span class="params">req, res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; url, method &#125; = req;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (url === <span class="string">&#x27;/&#x27;</span> &amp;&amp; method === <span class="string">&#x27;GET&#x27;</span>) &#123;</span><br><span class="line">    res.<span class="title function_">writeHead</span>(<span class="number">200</span>, &#123; <span class="string">&#x27;Content-Type&#x27;</span>: <span class="string">&#x27;text/plain&#x27;</span> &#125;);</span><br><span class="line">    res.<span class="title function_">end</span>(<span class="string">&#x27;Home Page&#x27;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (url === <span class="string">&#x27;/api&#x27;</span> &amp;&amp; method === <span class="string">&#x27;GET&#x27;</span>) &#123;</span><br><span class="line">    res.<span class="title function_">writeHead</span>(<span class="number">200</span>, &#123; <span class="string">&#x27;Content-Type&#x27;</span>: <span class="string">&#x27;application/json&#x27;</span> &#125;);</span><br><span class="line">    res.<span class="title function_">end</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(&#123; <span class="attr">data</span>: <span class="string">&#x27;API Response&#x27;</span> &#125;));</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    res.<span class="title function_">writeHead</span>(<span class="number">404</span>, &#123; <span class="string">&#x27;Content-Type&#x27;</span>: <span class="string">&#x27;text/plain&#x27;</span> &#125;);</span><br><span class="line">    res.<span class="title function_">end</span>(<span class="string">&#x27;Not Found&#x27;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;).<span class="title function_">listen</span>(<span class="number">3000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Server running on http://localhost:3000&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 发起 GET 请求（客户端行为）</span></span><br><span class="line">http.<span class="title function_">get</span>(<span class="string">&#x27;http://www.example.com&#x27;</span>, <span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> data = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line">  res.<span class="title function_">on</span>(<span class="string">&#x27;data&#x27;</span>, <span class="function"><span class="params">chunk</span> =&gt;</span> data += chunk);</span><br><span class="line">  res.<span class="title function_">on</span>(<span class="string">&#x27;end&#x27;</span>, <span class="function">() =&gt;</span> <span class="variable language_">console</span>.<span class="title function_">log</span>(data));</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>示例2</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> http = <span class="built_in">require</span>(<span class="string">&#x27;node:http&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 配置请求</span></span><br><span class="line"><span class="keyword">const</span> options = &#123;</span><br><span class="line">  <span class="attr">hostname</span>: <span class="string">&#x27;example.com&#x27;</span>, <span class="comment">// 目标主机</span></span><br><span class="line">  <span class="attr">port</span>: <span class="number">80</span>,               <span class="comment">// 端口（HTTP默认80）</span></span><br><span class="line">  <span class="attr">path</span>: <span class="string">&#x27;/api/data&#x27;</span>,      <span class="comment">// 请求路径</span></span><br><span class="line">  <span class="attr">method</span>: <span class="string">&#x27;POST&#x27;</span>,         <span class="comment">// HTTP方法</span></span><br><span class="line">  <span class="attr">headers</span>: &#123;              <span class="comment">// 请求头</span></span><br><span class="line">    <span class="string">&#x27;Content-Type&#x27;</span>: <span class="string">&#x27;application/json&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;Authorization&#x27;</span>: <span class="string">&#x27;Bearer token123&#x27;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 发起请求并处理响应</span></span><br><span class="line"><span class="keyword">const</span> req = http.<span class="title function_">request</span>(options, <span class="function">(<span class="params">res</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> responseData = <span class="string">&#x27;&#x27;</span>;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 接收数据片段</span></span><br><span class="line">  res.<span class="title function_">on</span>(<span class="string">&#x27;data&#x27;</span>, <span class="function">(<span class="params">chunk</span>) =&gt;</span> &#123;</span><br><span class="line">    responseData += chunk;</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 响应结束</span></span><br><span class="line">  res.<span class="title function_">on</span>(<span class="string">&#x27;end&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;响应结果:&#x27;</span>, responseData);</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 错误处理</span></span><br><span class="line">  res.<span class="title function_">on</span>(<span class="string">&#x27;error&#x27;</span>, <span class="function">(<span class="params">err</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">error</span>(<span class="string">&#x27;响应错误:&#x27;</span>, err);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 写入请求体（如POST数据）</span></span><br><span class="line">req.<span class="title function_">write</span>(<span class="title class_">JSON</span>.<span class="title function_">stringify</span>(&#123; <span class="attr">key</span>: <span class="string">&#x27;value&#x27;</span> &#125;));</span><br><span class="line"></span><br><span class="line"><span class="comment">// 超时控制</span></span><br><span class="line">req.<span class="built_in">setTimeout</span>(<span class="number">5000</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  req.<span class="title function_">destroy</span>(); <span class="comment">// 超时后终止请求</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;请求超时&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 表示请求结束（必须调用）</span></span><br><span class="line">req.<span class="title function_">end</span>();</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="5-7-events-模块"><a href="#5-7-events-模块" class="headerlink" title="5.7 events 模块"></a>5.7 events 模块</h3><p>用于实现事件驱动的编程模型，可以创建自定义事件并监听触发。</p>
+<p><strong>常用方法</strong>：</p>
+<ul>
+<li><code>EventEmitter.emit(eventName, [...args])</code>：触发事件</li>
+<li><code>EventEmitter.on(eventName, listener)</code>：监听事件</li>
+<li><code>EventEmitter.once(eventName, listener)</code>：监听一次事件</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="title class_">EventEmitter</span> = <span class="built_in">require</span>(<span class="string">&#x27;events&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建事件发射器</span></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">MyEmitter</span> <span class="keyword">extends</span> <span class="title class_ inherited__">EventEmitter</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> myEmitter = <span class="keyword">new</span> <span class="title class_">MyEmitter</span>();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 监听事件</span></span><br><span class="line">myEmitter.<span class="title function_">on</span>(<span class="string">&#x27;event&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Event was triggered!&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 触发事件</span></span><br><span class="line">myEmitter.<span class="title function_">emit</span>(<span class="string">&#x27;event&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 只监听一次</span></span><br><span class="line">myEmitter.<span class="title function_">once</span>(<span class="string">&#x27;one-time&#x27;</span>, <span class="function">() =&gt;</span> &#123;</span><br><span class="line">    <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;This will only run once&#x27;</span>);</span><br><span class="line">&#125;);</span><br><span class="line"></span><br><span class="line">myEmitter.<span class="title function_">emit</span>(<span class="string">&#x27;one-time&#x27;</span>);</span><br><span class="line">myEmitter.<span class="title function_">emit</span>(<span class="string">&#x27;one-time&#x27;</span>); <span class="comment">// 不会触发</span></span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="5-8-os-模块"><a href="#5-8-os-模块" class="headerlink" title="5.8 os 模块"></a>5.8 os 模块</h3><p>模块提供了与操作系统相关的实用方法和属性。</p>
+<p><strong>常用方法：</strong></p>
+<ul>
+<li><code>os.platform()</code>：返回操作系统平台</li>
+<li><code>os.cpus()</code>：返回操作系统的 CPU 信息</li>
+<li><code>os.totalmem()</code>：返回系统的总内存</li>
+<li><code>os.freemem()</code>：返回系统的可用内存</li>
+</ul>
+<p><strong>示例：</strong></p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> os = <span class="built_in">require</span>(<span class="string">&#x27;os&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Platform:&#x27;</span>, os.<span class="title function_">platform</span>());  <span class="comment">// linux, win32, darwin等</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;CPU Info:&#x27;</span>, os.<span class="title function_">cpus</span>());</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Total Memory:&#x27;</span>, os.<span class="title function_">totalmem</span>());</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Free Memory:&#x27;</span>, os.<span class="title function_">freemem</span>());</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="5-9-url-模块"><a href="#5-9-url-模块" class="headerlink" title="5.9 url 模块"></a>5.9 url 模块</h3><p>用于解析和处理 URL，方便提取和操作 URL 中的各个部分。</p>
+<p><strong>常用方法</strong>：</p>
+<ul>
+<li><code>url.parse(urlString)</code>：解析 URL 字符串，返回 URL 对象</li>
+<li><code>url.format(urlObject)</code>：将 URL 对象转换为字符串</li>
+<li><code>url.resolve(from, to)</code>：将相对路径转换为绝对路径</li>
+</ul>
+<p><strong>示例</strong>：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> url = <span class="built_in">require</span>(<span class="string">&#x27;url&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> myUrl = <span class="keyword">new</span> <span class="title function_">URL</span>(<span class="string">&#x27;https://example.com:8080/path/name?query=string#hash&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Protocol:&#x27;</span>, myUrl.<span class="property">protocol</span>); <span class="comment">// https:</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Host:&#x27;</span>, myUrl.<span class="property">host</span>); <span class="comment">// example.com:8080</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hostname:&#x27;</span>, myUrl.<span class="property">hostname</span>); <span class="comment">// example.com</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Port:&#x27;</span>, myUrl.<span class="property">port</span>); <span class="comment">// 8080</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Pathname:&#x27;</span>, myUrl.<span class="property">pathname</span>); <span class="comment">// /path/name</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Search:&#x27;</span>, myUrl.<span class="property">search</span>); <span class="comment">// ?query=string</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hash:&#x27;</span>, myUrl.<span class="property">hash</span>); <span class="comment">// #hash</span></span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Query:&#x27;</span>, myUrl.<span class="property">searchParams</span>.<span class="title function_">get</span>(<span class="string">&#x27;query&#x27;</span>)); <span class="comment">// string</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 解析 URL 字符串</span></span><br><span class="line"><span class="keyword">const</span> parsedUrl = url.<span class="title function_">parse</span>(<span class="string">&#x27;https://example.com/path?query=string&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(parsedUrl);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 格式化 URL 对象</span></span><br><span class="line"><span class="keyword">const</span> urlObject = &#123;</span><br><span class="line">    <span class="attr">protocol</span>: <span class="string">&#x27;https&#x27;</span>,</span><br><span class="line">    <span class="attr">host</span>: <span class="string">&#x27;example.com&#x27;</span>,</span><br><span class="line">    <span class="attr">pathname</span>: <span class="string">&#x27;/path&#x27;</span>,</span><br><span class="line">    <span class="attr">query</span>: &#123; <span class="attr">search</span>: <span class="string">&#x27;string&#x27;</span> &#125;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(url.<span class="title function_">format</span>(urlObject)); <span class="comment">// https://example.com/path?search=string</span></span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="5-9-crypto-模块"><a href="#5-9-crypto-模块" class="headerlink" title="5.9 crypto 模块"></a>5.9 crypto 模块</h3><p>用于提供加密功能，可以进行数据加密、解密、哈希等操作。</p>
+<p><strong>常用方法：</strong></p>
+<ul>
+<li><code>crypto.createHash(algorithm)</code>：创建哈希实例</li>
+<li><code>crypto.createCipheriv(algorithm, key, iv)</code>：创建加密实例</li>
+<li><code>crypto.createDecipheriv(algorithm, key, iv)</code>：创建解密实例</li>
+</ul>
+<p><strong>示例：</strong></p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> crypto = <span class="built_in">require</span>(<span class="string">&#x27;crypto&#x27;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建哈希实例</span></span><br><span class="line"><span class="keyword">const</span> hash = crypto.<span class="title function_">createHash</span>(<span class="string">&#x27;sha256&#x27;</span>);</span><br><span class="line">hash.<span class="title function_">update</span>(<span class="string">&#x27;Hello World&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(hash.<span class="title function_">digest</span>(<span class="string">&#x27;hex&#x27;</span>));  <span class="comment">// 输出哈希值</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 创建加密实例</span></span><br><span class="line"><span class="keyword">const</span> key = crypto.<span class="title function_">randomBytes</span>(<span class="number">32</span>);</span><br><span class="line"><span class="keyword">const</span> iv = crypto.<span class="title function_">randomBytes</span>(<span class="number">16</span>);</span><br><span class="line"><span class="keyword">const</span> cipher = crypto.<span class="title function_">createCipheriv</span>(<span class="string">&#x27;aes-256-cbc&#x27;</span>, key, iv);</span><br><span class="line"><span class="keyword">let</span> encrypted = cipher.<span class="title function_">update</span>(<span class="string">&#x27;Hello World&#x27;</span>, <span class="string">&#x27;utf8&#x27;</span>, <span class="string">&#x27;hex&#x27;</span>);</span><br><span class="line">encrypted += cipher.<span class="title function_">final</span>(<span class="string">&#x27;hex&#x27;</span>);</span><br><span class="line"><span class="variable language_">console</span>.<span class="title function_">log</span>(encrypted);</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="使用说明"><a href="#使用说明" class="headerlink" title="使用说明"></a>使用说明</h3><p>在 Node.js 中，<strong>核心模块（如 <code>fs</code>、<code>path</code>、<code>http</code> 等）在 CommonJS 和 ES Modules 两种模块系统中都可以直接调用</strong>，但具体使用方式略有差异。以下是详细说明：</p>
+<p><strong>(1) 默认导出的差异</strong></p>
+<ul>
+<li><p><strong>CommonJS</strong> 中，核心模块通常导出完整的对象：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>);</span><br><span class="line">fs.<span class="title function_">readFileSync</span>(...);</span><br></pre></td></tr></table></figure></div></li>
+<li><p><strong>ES Modules</strong> 中，部分核心模块可能提供<strong>命名导出</strong>（但大多数仍为默认导出）：</p>
+<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> &#123; readFileSync &#125; <span class="keyword">from</span> <span class="string">&#x27;fs&#x27;</span>; <span class="comment">// 命名导出（部分支持）</span></span><br><span class="line"><span class="keyword">import</span> fs <span class="keyword">from</span> <span class="string">&#x27;fs&#x27;</span>;               <span class="comment">// 默认导出（通用）</span></span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<p><strong>(2) 动态 <code>require()</code> 在 ES Modules 中不可用</strong></p>
+<ul>
+<li>在 ES Modules 文件中，不能直接使用 <code>require()</code>（除非通过 <code>createRequire</code> 创建）：<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ES Module 文件中（会报错）</span></span><br><span class="line"><span class="keyword">const</span> fs = <span class="built_in">require</span>(<span class="string">&#x27;fs&#x27;</span>); <span class="comment">// Error: require is not defined</span></span><br></pre></td></tr></table></figure></div>
+必须用 <code>import</code>：<div class="code-container" data-rel="Javascript"><figure class="iseeu highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> fs <span class="keyword">from</span> <span class="string">&#x27;fs&#x27;</span>;</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6. 总结"></a>6. 总结</h2><p>在 Node.js 的生态系统中，模块系统经历了从 CommonJS 到 ES Modules 的演进，每种方式都有其独特的特点和适用场景。</p>
+<table>
+<thead>
+<tr>
+<th align="left"><strong>特性</strong></th>
+<th align="left"><strong>ES Modules</strong></th>
+<th align="left"><strong>CommonJS</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><strong>语法</strong></td>
+<td align="left"><code>import/export</code></td>
+<td align="left"><code>require/module.exports</code></td>
+</tr>
+<tr>
+<td align="left"><strong>加载方式</strong></td>
+<td align="left">静态（编译时分析）</td>
+<td align="left">动态（运行时加载）</td>
+</tr>
+<tr>
+<td align="left"><strong>浏览器支持</strong></td>
+<td align="left">原生支持</td>
+<td align="left">需打包工具（如 Webpack）</td>
+</tr>
+<tr>
+<td align="left"><strong>Node.js 支持</strong></td>
+<td align="left"><code>.mjs</code> 或 <code>&quot;type&quot;: &quot;module&quot;</code></td>
+<td align="left">默认支持 <code>.js</code></td>
+</tr>
+<tr>
+<td align="left"><strong>顶层 <code>await</code></strong></td>
+<td align="left">支持</td>
+<td align="left">不支持</td>
+</tr>
+<tr>
+<td align="left"><strong>适用场景</strong></td>
+<td align="left">浏览器环境和静态优化</td>
+<td align="left">服务端文件系统 I&#x2F;O</td>
+</tr>
+</tbody></table>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a class="link"   target="_blank" rel="noopener" href="https://nodejs.org/api/modules.html#modules_the_module_wrapper" >Modules: CommonJS modules<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://nodejs.org/api/modules.html#modules_folders_as_modules" >Folders as Modules<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://nodejs.org/api/esm.html#esm_interop_with_commonjs" >ESM 和 CommonJS 的互操作<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://nodejs.org/api/" >Node.js 官方文档<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+
+		</div>
+
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E6%A8%A1%E5%9D%97%E5%8C%96/">#模块化</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/CommonJS/">#CommonJS</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/ES-Modules/">#ES Modules</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="prev" rel="prev" href="/2023/08/03/Promise/">
+					<span class="left arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-left"></i>
+					</span>
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">JavaScript异步编程：从回调到Promise</span>
+						<span class="post-nav-item">Prev posts</span>
+					</span>
+				</a>
+			</div>
+			
+			
+		</div>
+		
+
+
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">Node.js 模块化详解：从 CommonJS 到 ES Modules</div>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%A8%A1%E5%9D%97%E5%8C%96%E6%A6%82%E8%BF%B0"><span class="nav-text">1. 模块化概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E4%BB%80%E4%B9%88%E6%98%AF%E6%A8%A1%E5%9D%97%E5%8C%96"><span class="nav-text">1.1 什么是模块化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E6%A8%A1%E5%9D%97%E5%8C%96%E7%9A%84%E5%8E%86%E5%8F%B2%E8%83%8C%E6%99%AF"><span class="nav-text">1.2 模块化的历史背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E6%A8%A1%E5%9D%97%E5%8C%96%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-text">1.3 模块化解决的问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-CommonJS-%E6%A8%A1%E5%9D%97%E8%A7%84%E8%8C%83"><span class="nav-text">2. CommonJS 模块规范</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-text">2.1 基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-text">2.2 基本用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E6%A8%A1%E5%9D%97%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86"><span class="nav-text">2.3 模块加载原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E6%96%87%E4%BB%B6%E5%A4%B9%E4%BD%9C%E4%B8%BA%E6%A8%A1%E5%9D%97"><span class="nav-text">2.4 文件夹作为模块</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-ES-Modules-%E7%AE%80%E4%BB%8B"><span class="nav-text">3. ES Modules 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-text">3.1 基本概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-text">3.2 基本用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-text">3.3 注意事项</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-CommonJS-VS-ES-Modules"><span class="nav-text">4. CommonJS VS ES Modules</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-require-%E6%98%AF%E5%90%8C%E6%AD%A5%E7%9A%84%EF%BC%8C%E6%97%A0%E6%B3%95%E7%9B%B4%E6%8E%A5%E5%8A%A0%E8%BD%BD-ES-%E6%A8%A1%E5%9D%97"><span class="nav-text">4.1 require() 是同步的，无法直接加载 ES 模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E5%9C%A8-CommonJS-%E4%B8%AD%E5%8A%A0%E8%BD%BD-ES-%E6%A8%A1%E5%9D%97%E7%9A%84%E6%96%B9%E6%B3%95"><span class="nav-text">4.2 在 CommonJS 中加载 ES 模块的方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Node-js%E6%A0%B8%E5%BF%83%E6%A8%A1%E5%9D%97"><span class="nav-text">5. Node.js核心模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-global%E5%AF%B9%E8%B1%A1"><span class="nav-text">5.1 global对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-dirname%E5%85%A8%E5%B1%80%E5%8F%98%E9%87%8F"><span class="nav-text">5.2 __dirname全局变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-process%E6%A8%A1%E5%9D%97"><span class="nav-text">5.3 process模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-path%E6%A8%A1%E5%9D%97"><span class="nav-text">5.4 path模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-5-fs%E6%A8%A1%E5%9D%97"><span class="nav-text">5.5 fs模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-6-HTTP%E6%A8%A1%E5%9D%97"><span class="nav-text">5.6 HTTP模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-7-events-%E6%A8%A1%E5%9D%97"><span class="nav-text">5.7 events 模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-8-os-%E6%A8%A1%E5%9D%97"><span class="nav-text">5.8 os 模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-9-url-%E6%A8%A1%E5%9D%97"><span class="nav-text">5.9 url 模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-9-crypto-%E6%A8%A1%E5%9D%97"><span class="nav-text">5.9 crypto 模块</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-text">使用说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E6%80%BB%E7%BB%93"><span class="nav-text">6. 总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-text">参考</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+            <div class="customize-info my-1">The more you know, the more you realize you don't know.</div>
+        
+        <div class="text-center">
+            &copy;
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-shield-cat"></i>&nbsp;&nbsp;<a href="/">NIX</a>
+            
+        </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog "></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Search..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        
+<script src="/js/build/libs/mermaid.min.js"></script>
+
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
