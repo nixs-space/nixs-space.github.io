@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="NIX">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2025/08/23/docker-volume/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入理解 Docker 数据卷：数据持久化的终极指南">
+<meta property="og:url" content="http://example.com/2025/08/23/docker-volume/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2025-08-23T02:00:00.000Z">
+<meta property="article:modified_time" content="2025-08-23T02:00:00.000Z">
+<meta property="article:author" content="John Doe">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="数据卷">
+<meta property="article:tag" content="容器持久化">
+<meta property="article:tag" content="数据管理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/icon/favicon.svg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/icon/favicon.svg">
+    <meta name="theme-color" content="#C5B358">
+    <link rel="shortcut icon" href="/images/icon/favicon.svg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            深入理解 Docker 数据卷：数据持久化的终极指南 | NIX&#39;S SPACE
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en","path":"search.json"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":true,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":false,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":4,"number":false,"expand":true,"init_open":true},"copyright":{"enable":false,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#C5B358","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":true},"scroll_progress":{"bar":true,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":false,"site_pv":false,"site_uv":false,"post_pv":false},"single_page":true,"preloader":{"enable":false,"custom_message":null},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Hexo Theme Redefine, Redefine Your Hexo Journey."},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/background.webp","dark":"/images/background-dark.jpeg"},"title":"NIX'S SPACE","subtitle":{"text":[],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"style":"default","links":{"github":"https://nixs-space.github.io/","twitter":"https://x.com/nixs_space","email":"nixs.space@gmail.com"},"qrs":{"weixin":"https://nixs-space.github.io/images/weixin.png"}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":true,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#B8BC4773","right":"#3D4D2973","transparency":45},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tags"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"},"About":{"icon":"fa-regular fa-user","submenus":{"Me":"/about","Github":"https://github.com/nixs-space"}}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"info","announcement":null,"show_on_mobile":true,"links":{"Archives":{"path":"/archives","icon":"fa-regular fa-archive"},"Tags":{"path":"/tags","icon":"fa-regular fa-tags"},"Categories":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}}};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+		<span class="scroll-progress-bar"></span>
+	
+
+	
+		<span class="pjax-progress-bar"></span>
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+                <a class="logo-image h-8 w-8 sm:w-10 sm:h-10 mr-3" href="/">
+                    <img src="/images/icon/galaxy.svg" class="w-full h-full rounded-xs">
+                </a>
+            
+            <a class="logo-title" href="/">
+                
+                NIX&#39;S SPACE
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/archives"
+                                        >
+                                    <i class="fa-regular fa-archive fa-fw"></i>
+                                    ARCHIVES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/tags"
+                                        >
+                                    <i class="fa-regular fa-tags fa-fw"></i>
+                                    TAGS
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories"
+                                        >
+                                    <i class="fa-regular fa-folder fa-fw"></i>
+                                    CATEGORIES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class="has-dropdown"
+                                   href="#"
+                                        onClick=&#34;return false;&#34;>
+                                    <i class="fa-regular fa-user fa-fw"></i>
+                                    ABOUT
+                                    <i class="fa-solid fa-chevron-down fa-fw"></i>
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                                    <ul class="sub-menu">
+                                        
+                                            <li>
+                                                <a href="/about">
+                                                    ME
+                                                </a>
+                                            </li>
+                                        
+                                            <li>
+                                                <a target="_blank" rel="noopener" href="https://github.com/nixs-space">
+                                                    GITHUB
+                                                </a>
+                                            </li>
+                                        
+                                    </ul>
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/archives"
+                        >
+                            <span>
+                                ARCHIVES
+                            </span>
+                            
+                                <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/tags"
+                        >
+                            <span>
+                                TAGS
+                            </span>
+                            
+                                <i class="fa-regular fa-tags fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories"
+                        >
+                            <span>
+                                CATEGORIES
+                            </span>
+                            
+                                <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item-sub text-base my-1.5 flex flex-col w-full">
+                        
+                        <div class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary cursor-pointer text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                             navbar-data-toggle="submenu-About"
+                        >
+                            <span>
+                                ABOUT
+                            </span>
+                            
+                                <i class="fa-solid fa-chevron-right fa-sm fa-fw transition-all"></i>
+                            
+                        </div>
+                        
+
+                        
+                            <div class="flex-col items-start px-2 py-2 hidden" data-target="submenu-About">
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           href="/about">ME</a>
+                                    </div>
+                                
+                                    <div class="drawer-navbar-item text-base flex flex-col justify-center items-start hover:underline active:underline hover:underline-offset-1 rounded-3xl">
+                                        <a class=" text-third-text-color text-xl"
+                                           target="_blank" rel="noopener" href="https://github.com/nixs-space">GITHUB</a>
+                                    </div>
+                                
+                            </div>
+                        
+                    </li>
+            
+
+            
+            
+                
+                    
+                    
+                    
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">16</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">10</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">6</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			
+			
+			<img src="https://images.unsplash.com/photo-1589652717521-10c0d092dea9?ixlib=rb-4.0.3&amp;auto=format&amp;fit=crop&amp;w=1200&amp;q=80" alt="深入理解 Docker 数据卷：数据持久化的终极指南" class="w-full h-60 sm:h-72 md:h-80 object-cover sm:rounded-t-large dark:brightness-75" />
+			
+			<div class="w-full flex items-center absolute bottom-0 justify-start">
+				<h1 class="article-title-cover text-center mx-6 my-6 text-second-text-color bg-background-color-transparent px-4 py-3 text-3xl sm:text-4xl md:text-5xl font-semibold backdrop-blur-lg rounded-xl border border-border-color ">深入理解 Docker 数据卷：数据持久化的终极指南</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/avatar.jpg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">NIX</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2025-08-23 10:00</span>
+        <span class="mobile">2025-08-23 10:00</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-08-23 10:00</span>
+            <span class="mobile">2025-08-23 10:00</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/">容器技术</a>&nbsp;
+                        </li>
+                    
+                    
+                
+                    
+                        
+                            <li>></li>
+                        
+                        <li>
+                            <a href="/categories/%E5%AE%B9%E5%99%A8%E6%8A%80%E6%9C%AF/DevOps/">DevOps</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/Docker/">Docker</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/%E6%95%B0%E6%8D%AE%E5%8D%B7/">数据卷</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/%E5%AE%B9%E5%99%A8%E6%8C%81%E4%B9%85%E5%8C%96/">容器持久化</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/">数据管理</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>2.8k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>10 Mins</span>
+        </span>
+    
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="Docker-数据卷详解"><a href="#Docker-数据卷详解" class="headerlink" title="Docker 数据卷详解"></a>Docker 数据卷详解</h1><h2 id="引言：为什么需要数据卷？"><a href="#引言：为什么需要数据卷？" class="headerlink" title="引言：为什么需要数据卷？"></a>引言：为什么需要数据卷？</h2><p>在 Docker 的日常使用中，我们经常会遇到一个棘手的问题：<strong>“容器删除后，我的数据去哪儿了？”</strong> 想象一下这样的场景：您运行了一个 MySQL 容器，存储了重要业务数据，然后因为版本升级或配置变更删除了容器，结果发现所有数据都随之消失了。这种经历足以让任何开发者心惊胆战。</p>
+<p>正是为了解决这个痛点，Docker 数据卷（Volume）应运而生。数据卷不仅是 Docker 的核心功能，更是实现生产环境可靠部署的关键技术。</p>
+<h2 id="一、数据卷是什么？"><a href="#一、数据卷是什么？" class="headerlink" title="一、数据卷是什么？"></a>一、数据卷是什么？</h2><h3 id="核心定义"><a href="#核心定义" class="headerlink" title="核心定义"></a>核心定义</h3><p><strong>数据卷是一个由 Docker 管理的、独立于容器生命周期的特殊目录。</strong> 它存在于宿主机上，但可以被一个或多个容器挂载和使用。</p>
+<p>可以通过一个比喻来理解数据卷：</p>
+<ul>
+<li><strong>容器</strong> → 一台电脑（或一台电脑上的一个用户账户）<ul>
+<li>电脑可能会中毒、系统可能会崩溃，你可能会重装系统甚至换一台新电脑。</li>
+</ul>
+</li>
+<li><strong>镜像</strong> → 电脑出厂时的预装系统（或系统安装盘）<ul>
+<li>用它可以把任何一台电脑恢复到一模一样的状态。</li>
+</ul>
+</li>
+<li><strong>数据卷</strong> → 外接的移动硬盘或U盘<ul>
+<li>你的重要个人文件——工作文档、家庭照片、音乐库——从来都不只放在电脑的C盘里，而是习惯性地保存在<strong>移动硬盘</strong>上。</li>
+<li>这样，无论电脑本身发生什么变化，只要你的移动硬盘还在，数据就是安全的。你可以把这块硬盘插到任何一台新电脑上继续工作。</li>
+</ul>
+</li>
+</ul>
+<p><strong>这个比喻的核心是：数据卷是一个可移植、可插拔的独立存储设备。</strong></p>
+<h2 id="二、数据卷的核心特性"><a href="#二、数据卷的核心特性" class="headerlink" title="二、数据卷的核心特性"></a>二、数据卷的核心特性</h2><h3 id="1-持久化（Persistence）"><a href="#1-持久化（Persistence）" class="headerlink" title="1. 持久化（Persistence）"></a>1. 持久化（Persistence）</h3><p>数据卷的生命周期完全独立于容器。即使所有挂载它的容器都被删除，数据卷及其包含的数据仍然存在。</p>
+<h3 id="2-解耦（Decoupling）"><a href="#2-解耦（Decoupling）" class="headerlink" title="2. 解耦（Decoupling）"></a>2. 解耦（Decoupling）</h3><p>将应用程序数据与运行环境分离：</p>
+<ul>
+<li>容器：包含应用代码和运行环境</li>
+<li>数据卷：存储应用产生的数据、配置文件和日志</li>
+</ul>
+<h3 id="3-高性能"><a href="#3-高性能" class="headerlink" title="3. 高性能"></a>3. 高性能</h3><p>Docker 管理的数据卷在大多数平台上都提供接近原生文件系统的性能表现。</p>
+<h3 id="4-易于管理"><a href="#4-易于管理" class="headerlink" title="4. 易于管理"></a>4. 易于管理</h3><p>支持方便的备份、恢复和迁移操作，与标准 Linux 工具完美兼容。</p>
+<h3 id="5-共享能力"><a href="#5-共享能力" class="headerlink" title="5. 共享能力"></a>5. 共享能力</h3><p>一个数据卷可以被多个容器同时挂载，实现容器间的数据共享和协作。</p>
+<h2 id="三、数据卷的两种主要类型"><a href="#三、数据卷的两种主要类型" class="headerlink" title="三、数据卷的两种主要类型"></a>三、数据卷的两种主要类型</h2><h3 id="1-Docker-管理的数据卷（Named-Volumes）"><a href="#1-Docker-管理的数据卷（Named-Volumes）" class="headerlink" title="1. Docker 管理的数据卷（Named Volumes）"></a>1. Docker 管理的数据卷（Named Volumes）</h3><p>🏆 <strong>推荐用于生产环境</strong></p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>由 Docker 完全管理</li>
+<li>存储在 Docker 的特定区域（通常是 <code>/var/lib/docker/volumes/</code>）</li>
+<li>通过友好名称引用，无需关心具体路径</li>
+</ul>
+<p><strong>管理命令：</strong></p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建数据卷</span></span><br><span class="line">docker volume create my-app-data</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看所有数据卷</span></span><br><span class="line">docker volume <span class="built_in">ls</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看数据卷详情</span></span><br><span class="line">docker volume inspect my-app-data</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除未使用数据卷</span></span><br><span class="line">docker volume prune</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>使用示例：</strong></p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 运行 MySQL 并使用数据卷持久化数据</span></span><br><span class="line">docker run -d \</span><br><span class="line">  --name mysql-db \</span><br><span class="line">  -v mysql-data:/var/lib/mysql \</span><br><span class="line">  -e MYSQL_ROOT_PASSWORD=secret \</span><br><span class="line">  mysql:8.0</span><br><span class="line">  </span><br><span class="line"><span class="comment"># 丢弃容器后</span></span><br><span class="line">docker stop mysql-db</span><br><span class="line">docker <span class="built_in">rm</span> mysql-db</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重新部署：创建新容器，恢复旧数据</span></span><br><span class="line">docker run -d \</span><br><span class="line">  --name new-mysql-db \</span><br><span class="line">  -v mysql-data:/var/lib/mysql \</span><br><span class="line">  -e MYSQL_ROOT_PASSWORD=secret \</span><br><span class="line">  mysql:8.0</span><br></pre></td></tr></table></figure></div>
+
+<p>参数解析：<code>-v mysql-data:/var/lib/mysql</code></p>
+<ul>
+<li><code>-v</code>: <code>--volume</code> 的简写。用于创建或使用一个<strong>数据卷</strong>，实现数据持久化。</li>
+<li><strong><code>mysql-data</code></strong>: 这是<strong>数据卷的名称</strong>。Docker 会在宿主机上管理这个命名的存储空间。如果名为 <code>mysql-data</code> 的卷不存在，Docker 会自动创建它。</li>
+<li><strong><code>/var/lib/mysql</code></strong>: 这是 <strong>MySQL 容器内部的路径</strong>。MySQL 官方镜像默认将其所有数据（数据库、表、用户信息等）都存储在这个目录下。</li>
+<li><strong>映射关系</strong>：<code>-v host-volume:container-path</code><ul>
+<li>这里使用的是<strong>命名卷（Named Volume）</strong>，所以 Docker 管理卷的具体存储位置（通常在 <code>/var/lib/docker/volumes/</code> 下）。</li>
+<li>效果：任何写入容器内 <code>/var/lib/mysql</code> 的数据，实际上都被安全地写到了宿主机的 <code>mysql-data</code> 卷中。</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-绑定挂载（Bind-Mounts）"><a href="#2-绑定挂载（Bind-Mounts）" class="headerlink" title="2. 绑定挂载（Bind Mounts）"></a>2. 绑定挂载（Bind Mounts）</h3><p>🔧 <strong>适合开发环境</strong></p>
+<p><strong>特点：</strong></p>
+<ul>
+<li>将宿主机任意目录挂载到容器</li>
+<li>直接映射到指定路径</li>
+<li>用于开发时代码实时同步</li>
+</ul>
+<p><strong>使用示例：</strong></p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 开发时挂载源代码目录</span></span><br><span class="line">docker run -d \</span><br><span class="line">  --name dev-server \</span><br><span class="line">  -v /path/to/your/code:/app \</span><br><span class="line">  -p 3000:3000 \</span><br><span class="line">  node:18</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h2 id="四、实战应用场景"><a href="#四、实战应用场景" class="headerlink" title="四、实战应用场景"></a>四、实战应用场景</h2><h3 id="场景-1：数据库数据持久化"><a href="#场景-1：数据库数据持久化" class="headerlink" title="场景 1：数据库数据持久化"></a>场景 1：数据库数据持久化</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建专门的数据卷</span></span><br><span class="line">docker volume create postgres-data</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行 PostgreSQL 容器</span></span><br><span class="line">docker run -d \</span><br><span class="line">  --name postgres-db \</span><br><span class="line">  -v postgres-data:/var/lib/postgresql/data \</span><br><span class="line">  -e POSTGRES_PASSWORD=mysecretpassword \</span><br><span class="line">  postgres:13</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安全升级：删除旧容器，用新镜像启动并重用数据卷</span></span><br><span class="line">docker stop postgres-db</span><br><span class="line">docker <span class="built_in">rm</span> postgres-db</span><br><span class="line">docker run -d \</span><br><span class="line">  --name postgres-new \</span><br><span class="line">  -v postgres-data:/var/lib/postgresql/data \</span><br><span class="line">  postgres:14 <span class="comment"># 版本升级，数据保留！</span></span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="场景-2：多容器数据共享"><a href="#场景-2：多容器数据共享" class="headerlink" title="场景 2：多容器数据共享"></a>场景 2：多容器数据共享</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建一个共享数据卷</span></span><br><span class="line">docker volume create shared-data</span><br><span class="line"></span><br><span class="line"><span class="comment"># 容器A：写入数据</span></span><br><span class="line">docker run -d \</span><br><span class="line">  --name producer \</span><br><span class="line">  -v shared-data:/shared \</span><br><span class="line">  alpine sh -c <span class="string">&quot;echo &#x27;Hello from Container A&#x27; &gt; /shared/message.txt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 容器B：读取数据</span></span><br><span class="line">docker run --<span class="built_in">rm</span> \</span><br><span class="line">  --name consumer \</span><br><span class="line">  -v shared-data:/shared \</span><br><span class="line">  alpine <span class="built_in">cat</span> /shared/message.txt</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="场景-3：开发环境实时同步"><a href="#场景-3：开发环境实时同步" class="headerlink" title="场景 3：开发环境实时同步"></a>场景 3：开发环境实时同步</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 绑定挂载源代码，实现实时重载</span></span><br><span class="line">docker run -d \</span><br><span class="line">  --name dev-container \</span><br><span class="line">  -v $(<span class="built_in">pwd</span>)/src:/app/src \</span><br><span class="line">  -v $(<span class="built_in">pwd</span>)/public:/app/public \</span><br><span class="line">  -p 3000:3000 \</span><br><span class="line">  react-app</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h2 id="五、高级技巧与最佳实践"><a href="#五、高级技巧与最佳实践" class="headerlink" title="五、高级技巧与最佳实践"></a>五、高级技巧与最佳实践</h2><h3 id="1-使用-mount-语法（更现代）"><a href="#1-使用-mount-语法（更现代）" class="headerlink" title="1. 使用 --mount 语法（更现代）"></a>1. 使用 <code>--mount</code> 语法（更现代）</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># --mount 语法更明确，推荐在新项目中使用</span></span><br><span class="line">docker run -d \</span><br><span class="line">  --mount <span class="built_in">source</span>=my-volume,target=/app/data \</span><br><span class="line">  --name my-app \</span><br><span class="line">  my-app-image</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="2-设置数据卷权限"><a href="#2-设置数据卷权限" class="headerlink" title="2. 设置数据卷权限"></a>2. 设置数据卷权限</h3><div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 确保容器用户有数据卷写入权限</span></span><br><span class="line">docker run -d \</span><br><span class="line">  -v app-data:/app/data \</span><br><span class="line">  -u 1000:1000 \ <span class="comment"># 指定用户UID和GID</span></span><br><span class="line">  my-app-image</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="3-数据备份与恢复"><a href="#3-数据备份与恢复" class="headerlink" title="3. 数据备份与恢复"></a>3. 数据备份与恢复</h3><p>这两个命令是 Docker 数据卷备份和恢复的“标准操作”，核心思想是<strong>创建一个“临时工具人”容器</strong>。</p>
+<p>这两个命令都没有启动一个长期运行的服务，而是<strong>启动一个极简的 Alpine Linux 容器，执行一个特定的任务（打包或解压），任务完成就自动退出并删除容器</strong>。</p>
+<p><code>--rm</code> 选项就是这个思想的关键：它表示容器在<strong>运行结束后自动删除自己</strong>，不留任何痕迹，只留下我们想要的结果（备份文件或恢复的数据）。</p>
+<p><strong>命令一：备份详解</strong></p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">docker run --<span class="built_in">rm</span> \           <span class="comment"># ① 创建临时容器，任务完成即删</span></span><br><span class="line">  -v app-data:/source \     <span class="comment"># ② 把要备份的数据卷挂载到容器的 /source</span></span><br><span class="line">  -v $(<span class="built_in">pwd</span>):/backup \       <span class="comment"># ③ 把当前目录挂载到容器的 /backup</span></span><br><span class="line">  alpine \                  <span class="comment"># ④ 使用 alpine 镜像</span></span><br><span class="line">  tar -czf /backup/app-data-backup.tar.gz -C /source .  <span class="comment"># ⑤ 在容器内执行的备份命令</span></span><br></pre></td></tr></table></figure></div>
+
+<p>步骤拆解：</p>
+<ol>
+<li><strong>准备环境</strong>：Docker 拉取 <code>alpine</code> 镜像，并创建一个临时容器。</li>
+<li><strong>挂载数据</strong>：<ul>
+<li><code>-v app-data:/source</code>：将名为 <code>app-data</code> 的<strong>数据卷</strong>挂载到容器内的 <code>/source</code> 目录。现在容器能看到 <code>app-data</code> 卷里的所有文件，它们就在 <code>/source</code> 下。</li>
+<li><code>-v $(pwd):/backup</code>：将你<strong>当前的主机目录</strong>（例如 <code>/home/user/backups</code>）挂载到容器内的 <code>/backup</code> 目录。</li>
+</ul>
+</li>
+<li><strong>执行任务</strong>：容器启动后，不运行默认的 Shell，而是直接执行 <code>tar</code> 命令：<ul>
+<li><code>tar -czf /backup/app-data-backup.tar.gz -C /source .</code></li>
+<li>相当于在容器里执行了 <code>cd /source &amp;&amp; tar -czf /backup/app-data-backup.tar.gz .</code>。</li>
+</ul>
+</li>
+<li><strong>清理</strong>：<code>tar</code> 命令执行完毕，容器任务完成，自动退出。<code>--rm</code> 选项触发，这个临时容器被销毁。但它通过挂载的卷，已经成功地把数据卷里的内容“搬运”到了你的主机上，形成了一个备份文件。</li>
+</ol>
+<p><strong>比喻</strong>：这就像你雇了一个临时工（Alpine 容器），给了他两把钥匙：一把是仓库（<code>app-data</code> 卷）的钥匙，另一把是你家抽屉（当前目录）的钥匙。他的任务就是去仓库把所有的货物打包成一个箱子（<code>tar.gz</code> 文件），然后把这个箱子放进你的抽屉里。任务完成后，临时工就离开了。</p>
+<p><strong>命令二：恢复详解</strong></p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">docker run --<span class="built_in">rm</span> \                 <span class="comment"># ① 创建临时容器，任务完成即删</span></span><br><span class="line">  -v app-data:/target \           <span class="comment"># ② 把要恢复的目标数据卷挂载到容器的 /target</span></span><br><span class="line">  -v $(<span class="built_in">pwd</span>):/backup \             <span class="comment"># ③ 把存有备份文件的主机目录挂载到容器的 /backup</span></span><br><span class="line">  alpine sh -c <span class="string">&quot;rm -rf /target/* &amp;&amp; tar -xzf /backup/app-data-backup.tar.gz -C /target&quot;</span> <span class="comment"># ④</span></span><br></pre></td></tr></table></figure></div>
+
+<p>步骤拆解：</p>
+<ol>
+<li><strong>准备环境</strong>：同上，创建临时 Alpine 容器。</li>
+<li><strong>挂载数据</strong>：<ul>
+<li><code>-v app-data:/target</code>：将<strong>空白的</strong>（或有旧数据的）<code>app-data</code> 卷挂载到容器的 <code>/target</code> 目录。这是我们想要恢复数据的目标位置。</li>
+<li><code>-v $(pwd):/backup</code>：将存有备份文件 <code>app-data-backup.tar.gz</code> 的<strong>主机目录</strong>挂载到容器的 <code>/backup</code>。</li>
+</ul>
+</li>
+<li><strong>执行任务</strong>：容器启动后，执行一个由 <code>sh -c</code> 连接的两个命令：<ul>
+<li><strong><code>rm -rf /target/\*</code></strong>：<strong>清空目标卷</strong>。这是一个<strong>非常危险但必要的操作</strong>，它先删除 <code>/target</code> 下的所有内容，确保我们是从一个干净的状态恢复，避免新旧文件混杂冲突。</li>
+<li><strong><code>tar -xzf /backup/app-data-backup.tar.gz -C /target</code></strong>：将备份包中的所有文件，解压到 <code>/target</code> 目录下，也就是解压到了 <code>app-data</code> 数据卷中。</li>
+</ul>
+</li>
+<li><strong>清理</strong>：任务完成，容器自动销毁。</li>
+</ol>
+<p><strong>比喻</strong>：还是那个临时工，这次你给他的任务是：先去仓库（<code>app-data</code> 卷）把里面的旧东西全清空（<code>rm -rf</code>），然后把你抽屉里的那个备份箱子搬过来，打开，把里面的货物原封不动地摆回仓库里。摆完后他就离开。</p>
+<h3 id="4-数据卷清理策略"><a href="#4-数据卷清理策略" class="headerlink" title="4. 数据卷清理策略"></a>4. 数据卷清理策略</h3><p>定期清理无用数据卷，避免磁盘空间浪费：</p>
+<div class="code-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 删除所有未使用的数据卷</span></span><br><span class="line">docker volume prune</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除指定数据卷</span></span><br><span class="line">docker volume <span class="built_in">rm</span> old-volume-name</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h2 id="六、常见问题解答（FAQ）"><a href="#六、常见问题解答（FAQ）" class="headerlink" title="六、常见问题解答（FAQ）"></a>六、常见问题解答（FAQ）</h2><h3 id="Q1-数据卷存储在宿主机什么位置？"><a href="#Q1-数据卷存储在宿主机什么位置？" class="headerlink" title="Q1: 数据卷存储在宿主机什么位置？"></a>Q1: 数据卷存储在宿主机什么位置？</h3><p>A: Docker 管理的数据卷默认存储在 <code>/var/lib/docker/volumes/</code> 目录下。每个数据卷都有自己独立的子目录。</p>
+<h3 id="Q2-如何查看数据卷的实际大小？"><a href="#Q2-如何查看数据卷的实际大小？" class="headerlink" title="Q2: 如何查看数据卷的实际大小？"></a>Q2: 如何查看数据卷的实际大小？</h3><p>A: 使用 <code>docker system df -v</code> 命令可以查看详细的空间使用情况，包括数据卷的大小。</p>
+<h3 id="Q3-数据卷能否跨主机共享？"><a href="#Q3-数据卷能否跨主机共享？" class="headerlink" title="Q3: 数据卷能否跨主机共享？"></a>Q3: 数据卷能否跨主机共享？</h3><p>A: 原生的 Docker 数据卷不能直接跨主机共享。需要实现跨主机数据卷，可以考虑使用：</p>
+<ul>
+<li>NFS 等网络文件系统</li>
+<li>Docker 的卷插件（如 REX-Ray）</li>
+<li>分布式存储系统（如 Ceph, GlusterFS）</li>
+</ul>
+<h3 id="Q4-数据卷和绑定挂载哪个性能更好？"><a href="#Q4-数据卷和绑定挂载哪个性能更好？" class="headerlink" title="Q4: 数据卷和绑定挂载哪个性能更好？"></a>Q4: 数据卷和绑定挂载哪个性能更好？</h3><p>A: 在大多数情况下，Docker 管理的数据卷性能更优，特别是在 macOS 和 Windows 的 Docker Desktop 环境中，因为数据卷在这些平台上有特殊的优化。</p>
+<h2 id="七、其他学习资源"><a href="#七、其他学习资源" class="headerlink" title="七、其他学习资源"></a>七、其他学习资源</h2><ul>
+<li><a class="link"   target="_blank" rel="noopener" href="https://docs.docker.com/storage/volumes/" >Docker 官方文档 - 使用数据卷<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://docs.docker.com/engine/extend/plugins_volume/" >Docker Volume 插件列表<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   target="_blank" rel="noopener" href="https://github.com/veggiemonk/awesome-docker#volume" >Awesome Docker - 存储相关工具<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+
+		</div>
+
+		
+
+		
+		<ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/Docker/">#Docker</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E6%95%B0%E6%8D%AE%E5%8D%B7/">#数据卷</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E5%AE%B9%E5%99%A8%E6%8C%81%E4%B9%85%E5%8C%96/">#容器持久化</a>&nbsp;
+			</li>
+			
+			<li class="tag-item mx-0.5">
+				<a href="/tags/%E6%95%B0%E6%8D%AE%E7%AE%A1%E7%90%86/">#数据管理</a>&nbsp;
+			</li>
+			
+		</ul>
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2025/08/23/docker-fundamentals/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Docker 核心概念与基本使用</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">深入理解 Docker 数据卷：数据持久化的终极指南</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Docker-%E6%95%B0%E6%8D%AE%E5%8D%B7%E8%AF%A6%E8%A7%A3"><span class="nav-text">Docker 数据卷详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%95%E8%A8%80%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E6%95%B0%E6%8D%AE%E5%8D%B7%EF%BC%9F"><span class="nav-text">引言：为什么需要数据卷？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E6%95%B0%E6%8D%AE%E5%8D%B7%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-text">一、数据卷是什么？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E5%AE%9A%E4%B9%89"><span class="nav-text">核心定义</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%95%B0%E6%8D%AE%E5%8D%B7%E7%9A%84%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7"><span class="nav-text">二、数据卷的核心特性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%8C%81%E4%B9%85%E5%8C%96%EF%BC%88Persistence%EF%BC%89"><span class="nav-text">1. 持久化（Persistence）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%A7%A3%E8%80%A6%EF%BC%88Decoupling%EF%BC%89"><span class="nav-text">2. 解耦（Decoupling）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E9%AB%98%E6%80%A7%E8%83%BD"><span class="nav-text">3. 高性能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%98%93%E4%BA%8E%E7%AE%A1%E7%90%86"><span class="nav-text">4. 易于管理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E5%85%B1%E4%BA%AB%E8%83%BD%E5%8A%9B"><span class="nav-text">5. 共享能力</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E6%95%B0%E6%8D%AE%E5%8D%B7%E7%9A%84%E4%B8%A4%E7%A7%8D%E4%B8%BB%E8%A6%81%E7%B1%BB%E5%9E%8B"><span class="nav-text">三、数据卷的两种主要类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Docker-%E7%AE%A1%E7%90%86%E7%9A%84%E6%95%B0%E6%8D%AE%E5%8D%B7%EF%BC%88Named-Volumes%EF%BC%89"><span class="nav-text">1. Docker 管理的数据卷（Named Volumes）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E7%BB%91%E5%AE%9A%E6%8C%82%E8%BD%BD%EF%BC%88Bind-Mounts%EF%BC%89"><span class="nav-text">2. 绑定挂载（Bind Mounts）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AE%9E%E6%88%98%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-text">四、实战应用场景</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF-1%EF%BC%9A%E6%95%B0%E6%8D%AE%E5%BA%93%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-text">场景 1：数据库数据持久化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF-2%EF%BC%9A%E5%A4%9A%E5%AE%B9%E5%99%A8%E6%95%B0%E6%8D%AE%E5%85%B1%E4%BA%AB"><span class="nav-text">场景 2：多容器数据共享</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%BA%E6%99%AF-3%EF%BC%9A%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E5%AE%9E%E6%97%B6%E5%90%8C%E6%AD%A5"><span class="nav-text">场景 3：开发环境实时同步</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E9%AB%98%E7%BA%A7%E6%8A%80%E5%B7%A7%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="nav-text">五、高级技巧与最佳实践</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%BD%BF%E7%94%A8-mount-%E8%AF%AD%E6%B3%95%EF%BC%88%E6%9B%B4%E7%8E%B0%E4%BB%A3%EF%BC%89"><span class="nav-text">1. 使用 --mount 语法（更现代）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E8%AE%BE%E7%BD%AE%E6%95%B0%E6%8D%AE%E5%8D%B7%E6%9D%83%E9%99%90"><span class="nav-text">2. 设置数据卷权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E4%B8%8E%E6%81%A2%E5%A4%8D"><span class="nav-text">3. 数据备份与恢复</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%95%B0%E6%8D%AE%E5%8D%B7%E6%B8%85%E7%90%86%E7%AD%96%E7%95%A5"><span class="nav-text">4. 数据卷清理策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E8%A7%A3%E7%AD%94%EF%BC%88FAQ%EF%BC%89"><span class="nav-text">六、常见问题解答（FAQ）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Q1-%E6%95%B0%E6%8D%AE%E5%8D%B7%E5%AD%98%E5%82%A8%E5%9C%A8%E5%AE%BF%E4%B8%BB%E6%9C%BA%E4%BB%80%E4%B9%88%E4%BD%8D%E7%BD%AE%EF%BC%9F"><span class="nav-text">Q1: 数据卷存储在宿主机什么位置？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q2-%E5%A6%82%E4%BD%95%E6%9F%A5%E7%9C%8B%E6%95%B0%E6%8D%AE%E5%8D%B7%E7%9A%84%E5%AE%9E%E9%99%85%E5%A4%A7%E5%B0%8F%EF%BC%9F"><span class="nav-text">Q2: 如何查看数据卷的实际大小？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q3-%E6%95%B0%E6%8D%AE%E5%8D%B7%E8%83%BD%E5%90%A6%E8%B7%A8%E4%B8%BB%E6%9C%BA%E5%85%B1%E4%BA%AB%EF%BC%9F"><span class="nav-text">Q3: 数据卷能否跨主机共享？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Q4-%E6%95%B0%E6%8D%AE%E5%8D%B7%E5%92%8C%E7%BB%91%E5%AE%9A%E6%8C%82%E8%BD%BD%E5%93%AA%E4%B8%AA%E6%80%A7%E8%83%BD%E6%9B%B4%E5%A5%BD%EF%BC%9F"><span class="nav-text">Q4: 数据卷和绑定挂载哪个性能更好？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%85%B6%E4%BB%96%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%BA%90"><span class="nav-text">七、其他学习资源</span></a></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+            <div class="customize-info my-1">The more you know, the more you realize you don't know.</div>
+        
+        <div class="text-center">
+            &copy;
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-shield-cat"></i>&nbsp;&nbsp;<a href="/">NIX</a>
+            
+        </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog "></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Search..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+    
+<script src="/js/build/tools/localSearch.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+    
+        
+<script src="/js/build/libs/mermaid.min.js"></script>
+
+    
+    
+<script src="/js/build/plugins/mermaid.js"></script>
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
